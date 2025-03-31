@@ -30,7 +30,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Docker images
         working-directory: swift-ci/sdks/static-linux
-        run: ./build
+        # need 2 since the initial checkout sometimes fails
+        run: ./build || ./build
 
    android-build:
      name: Build Android image
