@@ -35,7 +35,7 @@ esac
 $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX -t static-swift-linux .
 
 # Check-out the sources
-scripts/fetch-source.sh --clone-with-ssh --source-dir source
+scripts/fetch-source.sh --source-dir source
 
 mkdir -p products
 
