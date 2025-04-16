@@ -4,6 +4,8 @@
 # the architecture(s) to build
 ARCH=aarch64
 #ARCH=x86_64,aarch64
+NDK=android-ndk-r27c
+API=28
 
 SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
 mkdir -p ${SDKROOT}
@@ -19,7 +21,7 @@ HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
 
 ${HOST_TOOLCHAIN}/bin/swift --version
 
-export ANDROID_NDK_HOME=${SDKROOT}/ndk/android-ndk-r27c
+export ANDROID_NDK_HOME=${SDKROOT}/ndk/${NDK}
 export ANDROID_NDK=${ANDROID_NDK_HOME}
 
 if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
@@ -42,5 +44,5 @@ if [[ ! -d ${SDKROOT}/src ]]; then
     ./scripts/fetch-source.sh --source-dir ${SDKROOT}/src
 fi
 
-./scripts/build.sh --patch-dir ${PATCHDIR} --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
+./scripts/build.sh --patch-dir ${PATCHDIR} --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${API} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
 
