@@ -1,15 +1,11 @@
 #!/bin/bash -ex
 # Swift Android SDK: Top-level Build Script
 
+# the architecture(s) to build
+ARCH=aarch64
+#ARCH=x86_64,aarch64
+
 SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
-
-mkdir -p ${SDKROOT}/products
-
-# Check-out the sources
-if [[ ! -d ${SDKROOT}/src ]]; then
-    scripts/fetch-source.sh --source-dir ${SDKROOT}/src
-fi
-
 mkdir -p ${SDKROOT}
 
 export ANDROID_NDK_HOME=${SDKROOT}/ndk/android-ndk-r27c
@@ -18,9 +14,18 @@ export ANDROID_NDK=${ANDROID_NDK_HOME}
 if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
     mkdir -p $(dirname ${ANDROID_NDK_HOME})
     pushd $(dirname ${ANDROID_NDK_HOME})
-    wget https://dl.google.com/android/repository/$(basename $ANDROID_NDK_HOME).zip
-    unzip $(basename $ANDROID_NDK_HOME).zip
+    NDKFILE=$(basename $ANDROID_NDK_HOME)-linux.zip
+    wget https://dl.google.com/android/repository/${NDKFILE}
+    unzip ${NDKFILE}
     popd
+fi
+
+
+mkdir -p ${SDKROOT}/products
+
+# Check-out the sources
+if [[ ! -d ${SDKROOT}/src ]]; then
+    scripts/fetch-source.sh --source-dir ${SDKROOT}/src
 fi
 
 if [[ ! -d ${SDKROOT}/src ]]; then
@@ -30,8 +35,6 @@ fi
 HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
 #HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-${HOME}/.local/share/swiftly/toolchains/6.1.0/usr}
 
-ARCH=aarch64
-#ARCH=x86_64
 ./scripts/build.sh --products-dir ${SDKROOT}/prod --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
 
 
