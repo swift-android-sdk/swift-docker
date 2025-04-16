@@ -8,6 +8,17 @@ ARCH=aarch64
 SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
 mkdir -p ${SDKROOT}
 
+# fetch the patches
+PATCHDIR=${SDKROOT}/patches
+if [[ ! -d ${PATCHDIR} ]]; then
+    git clone https://github.com/finagolfin/swift-android-sdk.git ${PATCHDIR}
+fi
+
+HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
+#HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-${HOME}/.local/share/swiftly/toolchains/6.1.0/usr}
+
+${HOST_TOOLCHAIN}/bin/swift --version
+
 export ANDROID_NDK_HOME=${SDKROOT}/ndk/android-ndk-r27c
 export ANDROID_NDK=${ANDROID_NDK_HOME}
 
@@ -20,7 +31,6 @@ if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
     popd
 fi
 
-
 mkdir -p ${SDKROOT}/products
 
 # Check-out the sources
@@ -32,9 +42,5 @@ if [[ ! -d ${SDKROOT}/src ]]; then
     ./scripts/fetch-source.sh --source-dir ${SDKROOT}/src
 fi
 
-HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
-#HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-${HOME}/.local/share/swiftly/toolchains/6.1.0/usr}
-
-./scripts/build.sh --products-dir ${SDKROOT}/prod --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
-
+./scripts/build.sh --patch-dir ${PATCHDIR} --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
 

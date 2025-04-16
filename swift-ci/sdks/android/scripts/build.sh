@@ -108,13 +108,14 @@ source_dir=
 ndk_home=${ANDROID_NDK}
 build_dir=$(pwd)/build
 products_dir=
-# the location of the patches to apply
-patch_dir=$(dirname $(dirname $(realpath $0)))
+patch_dir=
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --source-dir)
             source_dir="$2"; shift ;;
+        --patch-dir)
+            patch_dir="$2"; shift ;;
         --ndk-home)
             ndk_home="$2"; shift ;;
         --host-toolchain)
@@ -142,7 +143,7 @@ done
 # Change the commas for spaces
 archs="${archs//,/ }"
 
-if [[ -z "$source_dir" || -z "$products_dir" || -z "$ndk_home" || -z "$host_toolchain" ]]; then
+if [[ -z "$source_dir" || -z "$products_dir" || -z "$patch_dir" || -z "$ndk_home" || -z "$host_toolchain" ]]; then
     usage
     exit 1
 fi
