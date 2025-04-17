@@ -100,7 +100,7 @@ declare_package zlib "zlib" "Zlib" "https://zlib.net"
 # Parse command line arguments
 android_sdk_version=0.1
 sdk_name=
-archs=aarch64,armv7,x86_64,x86
+archs=aarch64,armv7,x86_64
 android_api=28
 build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
@@ -196,12 +196,16 @@ function quiet_popd {
 header "Swift Android SDK build script"
 
 swift_dir=$(realpath $(dirname "$swiftc")/..)
+HOST=linux-x86_64
+#HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+ndk_toolchain=$ndk_home/toolchains/llvm/prebuilt/$HOST
+
 
 echo "Swift found at ${swift_dir}"
 echo "Host toolchain found at ${host_toolchain}"
 ${host_toolchain}/bin/swift --version
 echo "Android NDK found at ${ndk_home}"
-${toolchain}/bin/clang --version
+${ndk_toolchain}/bin/clang --version
 echo "Building for ${archs}"
 echo "Sources are in ${source_dir}"
 echo "Build will happen in ${build_dir}"
@@ -219,17 +223,12 @@ function run() {
     "$@"
 }
 
-HOST=linux-x86_64
-#HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-
-ndktoolchain=$ndk_home/toolchains/llvm/prebuilt/$HOST
-
 for arch in $archs; do
     case $arch in
         armv7) target_host="arm-linux-androideabi"; compiler_target_host="armv7a-linux-androideabi$android_api"; android_abi="armeabi-v7a" ;;
         aarch64) target_host="aarch64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="arm64-v8a" ;;
-        x86) target_host="x86-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="x86" ;;
         x86_64) target_host="x86_64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="x86_64" ;;
+        x86) target_host="x86-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="x86" ;;
         *) echo "Unknown architecture '$1'"; usage; exit 0 ;;
     esac
 
@@ -334,6 +333,9 @@ for arch in $archs; do
             Release) build_type_flag="--release" ;;
             RelWithDebInfo) build_type_flag="--release-debuginfo" ;;
         esac
+
+        # use an out-of-tree build folder, otherwise subsequent arch builds have conflicts
+        export SWIFT_BUILD_ROOT=${build_dir}/$arch/swift-project
 
         ./swift/utils/build-script \
             $build_type_flag \

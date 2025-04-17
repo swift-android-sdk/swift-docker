@@ -1,15 +1,8 @@
 #!/bin/bash -ex
 # Swift Android SDK: Top-level Build Script
 
-# the architecture(s) to build; on GH Actions we build everything
-if [[ -z "${CI}" ]]; then
-    TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64}
-    #TARGET_ARCHS=${TARGET_ARCHS:-aarch64}
-else
-    TARGET_ARCHS=${TARGET_ARCHS:-armv7,aarch64,x86_64,x86}
-    #TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64}
-    #TARGET_ARCHS=${TARGET_ARCHS:-aarch64}
-fi
+# default architectures to build for
+TARGET_ARCHS=${TARGET_ARCHS:-armv7,aarch64,x86_64}
 
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
