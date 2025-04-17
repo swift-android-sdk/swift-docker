@@ -370,11 +370,9 @@ for arch in $archs; do
             #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=ON" \
 
         # THREADS_PREFER_PTHREAD_FLAG=OFF is needed to prevent adding the -pthread flag, which fails on Android
-
-        swiftc=$(find ${build_dir}/swift -name 'swiftc' | grep -v bootstrapping)
-        lld=$(find ${build_dir}/swift -name 'ld.lld')
-
-        echo "built: ${swiftc}"
+        #swiftc=$(find ${build_dir}/swift -name 'swiftc' | grep -v bootstrapping)
+        #lld=$(find ${build_dir}/swift -name 'ld.lld')
+        #echo "built: ${swiftc}"
 
     quiet_popd
 done
