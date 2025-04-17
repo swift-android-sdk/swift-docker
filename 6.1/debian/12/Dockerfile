@@ -5,15 +5,7 @@ LABEL description="Docker Container for the Swift programming language"
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && apt-get -q update && \
     apt-get -q install -y \
-<<<<<<< HEAD
-<<<<<<< HEAD
     binutils \
-=======
-    binutils-gold \
->>>>>>> bf9feec (Swift 6.1 Release Dockerfiles (#456))
-=======
-    binutils \
->>>>>>> dedc07b (Change binutils-gold package dependency on Debian 12 to binutils (#457))
     libicu-dev \
     libcurl4-openssl-dev \
     libedit-dev \
