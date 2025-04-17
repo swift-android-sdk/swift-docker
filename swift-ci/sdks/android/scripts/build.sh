@@ -108,14 +108,11 @@ source_dir=
 ndk_home=${ANDROID_NDK}
 build_dir=$(pwd)/build
 products_dir=
-patch_dir=
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --source-dir)
             source_dir="$2"; shift ;;
-        --patch-dir)
-            patch_dir="$2"; shift ;;
         --ndk-home)
             ndk_home="$2"; shift ;;
         --host-toolchain)
@@ -143,7 +140,7 @@ done
 # Change the commas for spaces
 archs="${archs//,/ }"
 
-if [[ -z "$source_dir" || -z "$products_dir" || -z "$patch_dir" || -z "$ndk_home" || -z "$host_toolchain" ]]; then
+if [[ -z "$source_dir" || -z "$products_dir" || -z "$ndk_home" || -z "$host_toolchain" ]]; then
     usage
     exit 1
 fi
@@ -222,30 +219,10 @@ function run() {
     "$@"
 }
 
-HOST=linux-x86_64
+#HOST=linux-x86_64
+HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
 ndktoolchain=$ndk_home/toolchains/llvm/prebuilt/$HOST
-
-function export_toolchain_vars {
-    # needed for libxml, but breaks Swift build-script,
-    # so need to call unexport_toolchain_vars aferwards
-    export AR=$ndktoolchain/bin/llvm-ar
-    export AS=$ndktoolchain/bin/llvm-as
-    export CC=$ndktoolchain/bin/$compiler_target_host-clang
-    export CXX=$ndktoolchain/bin/$compiler_target_host-clang++
-    export LD=$ndktoolchain/bin/ld
-    export RANLIB=$ndktoolchain/bin/llvm-ranlib
-    export STRIP=$ndktoolchain/bin/llvm-strip
-}
-
-function unexport_toolchain_vars {
-    export AR=
-    export AS=
-    export CC=
-    export CXX=
-    export LD=
-    export RANLIB=
-    export STRIP=
-}
 
 for arch in $archs; do
     case $arch in
@@ -341,26 +318,10 @@ for arch in $archs; do
         quiet_pushd ${build_dir}/$arch/curl
             run ninja -j$parallel_jobs install
         quiet_popd
-
     quiet_popd
 
     header "Building Android SDK for ${compiler_target_host}"
     quiet_pushd ${source_dir}/swift-project
-        # TODO: need to selectively apply patches based on release or not release
-        git apply $patch_dir/swift-android.patch || true
-        git apply -C1 $patch_dir/swift-android-ci.patch || true
-
-        # need to un-apply libandroid-spawn since we don't need it for API ???+
-        perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
-        perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
-        # fix for Process.swift:953:57: error: value of optional type 'posix_spawnattr_t?' (aka 'Optional<OpaquePointer>') must be unwrapped to a value of type 'posix_spawnattr_t' (aka 'OpaquePointer')
-        perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
-
-        git apply $patch_dir/swift-android-ci-release.patch || true
-        git apply $patch_dir/swift-android-testing-release.patch || true
-
-        perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
-
         # TODO: only for release (for some reason)
         LSP_BUILD="--sourcekit-lsp"
 
@@ -371,11 +332,9 @@ for arch in $archs; do
             RelWithDebInfo) build_type_flag="--release-debuginfo" ;;
         esac
 
-        #./swift/utils/build-script --help
-
-            #--reconfigure \
         ./swift/utils/build-script \
             $build_type_flag \
+            --reconfigure \
             --no-assertions \
             --android \
             --android-ndk $ndk_home \
@@ -408,6 +367,5 @@ for arch in $archs; do
         echo "built: ${swiftc}"
 
     quiet_popd
-
 done
 

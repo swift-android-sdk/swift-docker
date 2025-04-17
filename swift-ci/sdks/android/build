@@ -36,12 +36,6 @@ $HOST_TOOLCHAIN/bin/swift --version
 # ensure the correct Swift is first in the PATH
 export PATH=$HOST_TOOLCHAIN/bin:$PATH
 
-# fetch the patches
-PATCHDIR=${SDKROOT}/patches
-if [[ ! -d ${PATCHDIR} ]]; then
-    git clone https://github.com/finagolfin/swift-android-sdk.git ${PATCHDIR}
-fi
-
 export ANDROID_NDK_HOME=${SDKROOT}/ndk/${NDK}
 export ANDROID_NDK=${ANDROID_NDK_HOME}
 
@@ -61,5 +55,28 @@ if [[ ! -d ${SDKROOT}/src ]]; then
     scripts/fetch-source.sh --source-dir ${SDKROOT}/src
 fi
 
-./scripts/build.sh --patch-dir ${PATCHDIR} --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${API} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
+# fetch and apply the patches
+PATCHDIR=${SDKROOT}/patches
+if [[ ! -d ${PATCHDIR} ]]; then
+    git clone https://github.com/finagolfin/swift-android-sdk.git ${PATCHDIR}
+fi
+
+pushd ${SDKROOT}/src/swift-project
+    # TODO: need to selectively apply patches based on release or not release
+    git apply $PATCHDIR/swift-android.patch || true
+    git apply -C1 $PATCHDIR/swift-android-ci.patch || true
+
+    # need to un-apply libandroid-spawn since we don't need it for API ???+
+    perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
+    perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+    # fix for Process.swift:953:57: error: value of optional type 'posix_spawnattr_t?' (aka 'Optional<OpaquePointer>') must be unwrapped to a value of type 'posix_spawnattr_t' (aka 'OpaquePointer')
+    perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
+
+    git apply $PATCHDIR/swift-android-ci-release.patch || true
+    git apply $PATCHDIR/swift-android-testing-release.patch || true
+
+    perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+popd
+
+./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${API} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
 
