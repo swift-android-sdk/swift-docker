@@ -328,9 +328,6 @@ for arch in $archs; do
 
     header "Building Android SDK for ${compiler_target_host}"
     quiet_pushd ${source_dir}/swift-project
-        # TODO: only for release (for some reason)
-        LSP_BUILD="--sourcekit-lsp"
-
         build_type_flag="--debug"
         case $build_type in
             Debug) build_type_flag="--debug" ;;
@@ -360,12 +357,12 @@ for arch in $archs; do
             --install-libdispatch \
             --install-foundation \
             --xctest --install-xctest \
-            $LSP_BUILD \
             --swift-testing --install-swift-testing \
             --cross-compile-append-host-target-to-destdir=False
 
             #--llbuild --install-llbuild \
             #--swiftpm \
+            #--sourcekit-lsp \
 
             #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
             #--extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \

@@ -11,7 +11,7 @@ fi
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
 
-SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
+SDKROOT=${RUNNER_TEMP:-${TMPDIR:-'/tmp'}}/swift-android-sdk
 mkdir -p ${SDKROOT}
 
 # Install a Swift host toolchain if it isn't already present
