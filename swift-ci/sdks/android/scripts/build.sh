@@ -253,8 +253,8 @@ for arch in $archs; do
             -DLIBXML2_WITH_ICU=NO \
             -DLIBXML2_WITH_ICONV=NO \
             -DLIBXML2_WITH_LZMA=NO \
-            -DBUILD_SHARED_LIBS=NO \
-            -DBUILD_STATIC_LIBS=YES
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_STATIC_LIBS=ON
 
         quiet_pushd ${build_dir}/$arch/libxml2
             run ninja -j$parallel_jobs
@@ -276,8 +276,9 @@ for arch in $archs; do
             -DCMAKE_TOOLCHAIN_FILE=$ndk_home/build/cmake/android.toolchain.cmake \
             -DCMAKE_BUILD_TYPE=$build_type \
             -DCMAKE_INSTALL_PREFIX=$sdk_root/usr \
-            -DBUILD_SHARED_LIBS=NO \
-            -DBUILD_STATIC_LIBS=YES
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_STATIC_LIBS=ON \
+            -DBUILD_TESTING=OFF
 
         quiet_pushd ${build_dir}/$arch/boringssl
             run ninja -j$parallel_jobs
@@ -305,10 +306,15 @@ for arch in $archs; do
             -DOPENSSL_SSL_LIBRARY=$sdk_root/usr/lib/libssl.a \
             -DOPENSSL_CRYPTO_LIBRARY=$sdk_root/usr/lib/libcrypto.a \
             -DCURL_USE_OPENSSL=ON \
-            -DBUILD_SHARED_LIBS=NO \
-            -DBUILD_STATIC_LIBS=YES \
-            -DCURL_BUILD_TESTS=OFF \
-            -DBUILD_CURL_EXE=NO
+            -DCURLSSLOPT_NATIVE_CA=ON \
+            -DTHREADS_PREFER_PTHREAD_FLAG=OFF \
+            -DCMAKE_THREAD_PREFER_PTHREAD=OFF \
+            -DCMAKE_THREADS_PREFER_PTHREAD_FLAG=OFF \
+            -DCMAKE_HAVE_LIBC_PTHREAD=YES \
+            -DBUILD_CURL_EXE=NO \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_STATIC_LIBS=ON \
+            -DCURL_BUILD_TESTS=OFF
 
         quiet_pushd ${build_dir}/$arch/curl
             run ninja -j$parallel_jobs
@@ -359,9 +365,15 @@ for arch in $archs; do
             $LSP_BUILD \
             --swift-testing --install-swift-testing \
             --swift-install-components='compiler;clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
-            --extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=FALSE" \
-            --extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=FALSE" \
+            --extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
+            --extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
+            --extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=OFF" \
             --cross-compile-append-host-target-to-destdir=False
+
+            #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
+            #--extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
+            #--extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=OFF" \
+            #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=ON" \
 
         # THREADS_PREFER_PTHREAD_FLAG=OFF is needed to prevent adding the -pthread flag, which fails on Android
 
