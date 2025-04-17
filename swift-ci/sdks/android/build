@@ -1,28 +1,32 @@
 #!/bin/bash -ex
 # Swift Android SDK: Top-level Build Script
 
-# the architecture(s) to build
-ARCH=aarch64
-#ARCH=x86_64,aarch64
-NDK=android-ndk-r27c
-API=28
+# the architecture(s) to build; on GH Actions we build everything
+if [[ -z "${CI}" ]]; then
+    TARGET_ARCHS=${TARGET_ARCHS:-aarch64}
+else
+    TARGET_ARCHS=${TARGET_ARCHS:-aarch64,armv7,x86_64,x86}
+fi
+
+ANDROID_NDK_VERSION=android-ndk-r27c
+ANDROID_API=28
 
 SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
 mkdir -p ${SDKROOT}
 
 # Install a Swift host toolchain if it isn't already present
 SWIFT_ROOT=${SDKROOT}/host-toolchain
-HOST_ARCH=ubuntu24.04
+HOST_OS=ubuntu$(lsb_release -sr)
 SWIFT_VERSION=6.1
 SWIFT_TAG="swift-${SWIFT_VERSION}-RELEASE"
 SWIFT_BRANCH="swift-$(echo $SWIFT_TAG | cut -d- -f2)-release"
-SWIFT_BASE=$SWIFT_TAG-$HOST_ARCH
+SWIFT_BASE=$SWIFT_TAG-$HOST_OS
 
 if [[ ! -d $SWIFT_ROOT ]]; then
     mkdir -p $SWIFT_ROOT
     pushd $SWIFT_ROOT
 
-    SWIFT_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_ARCH | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
+    SWIFT_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_OS | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
     wget -q $SWIFT_URL
     tar xzf $SWIFT_BASE.tar.gz
 
@@ -36,7 +40,7 @@ $HOST_TOOLCHAIN/bin/swift --version
 # ensure the correct Swift is first in the PATH
 export PATH=$HOST_TOOLCHAIN/bin:$PATH
 
-export ANDROID_NDK_HOME=${SDKROOT}/ndk/${NDK}
+export ANDROID_NDK_HOME=${SDKROOT}/ndk/${ANDROID_NDK_VERSION}
 export ANDROID_NDK=${ANDROID_NDK_HOME}
 
 if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
@@ -89,5 +93,5 @@ pushd ${SDKROOT}/src/swift-project
     perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
 popd
 
-./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${API} --host-toolchain ${HOST_TOOLCHAIN} --archs $ARCH
+./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs $TARGET_ARCHS
 

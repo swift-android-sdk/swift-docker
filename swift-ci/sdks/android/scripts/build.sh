@@ -356,7 +356,6 @@ for arch in $archs; do
             --skip-build-cmark \
             --skip-local-build \
             --build-swift-static-stdlib \
-            --swiftpm \
             --install-swift \
             --install-libdispatch \
             --install-foundation \
@@ -366,6 +365,7 @@ for arch in $archs; do
             --cross-compile-append-host-target-to-destdir=False
 
             #--llbuild --install-llbuild \
+            #--swiftpm \
 
             #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
             #--extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
