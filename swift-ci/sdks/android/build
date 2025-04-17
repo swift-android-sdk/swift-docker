@@ -68,9 +68,6 @@ pushd ${SDKROOT}/src/swift-project
     # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
     perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $PATCHDIR/swift-android.patch
 
-    echo "### PATCH: $PATCHDIR/swift-android.patch"
-    cat $PATCHDIR/swift-android.patch
-
     git apply $PATCHDIR/swift-android.patch || true
     git apply -C1 $PATCHDIR/swift-android-ci.patch || true
 
@@ -80,6 +77,9 @@ pushd ${SDKROOT}/src/swift-project
 
     # fix for Process.swift:953:57: error: value of optional type 'posix_spawnattr_t?' (aka 'Optional<OpaquePointer>') must be unwrapped to a value of type 'posix_spawnattr_t' (aka 'OpaquePointer')
     #perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
+
+    # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
+    perl -pi -e 's/os\(Android\)/os\(AndroidDISABLED\)/g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
 
     git apply $PATCHDIR/swift-android-ci-release.patch || true
     git apply $PATCHDIR/swift-android-testing-release.patch || true

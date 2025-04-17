@@ -357,18 +357,15 @@ for arch in $archs; do
             --skip-local-build \
             --build-swift-static-stdlib \
             --swiftpm \
-            --llbuild --install-llbuild \
             --install-swift \
             --install-libdispatch \
             --install-foundation \
             --xctest --install-xctest \
             $LSP_BUILD \
             --swift-testing --install-swift-testing \
-            --swift-install-components='compiler;clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
-            --extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
-            --extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
-            --extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=OFF" \
             --cross-compile-append-host-target-to-destdir=False
+
+            #--llbuild --install-llbuild \
 
             #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
             #--extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
