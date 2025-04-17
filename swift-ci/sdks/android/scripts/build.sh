@@ -359,7 +359,11 @@ for arch in $archs; do
             $LSP_BUILD \
             --swift-testing --install-swift-testing \
             --swift-install-components='compiler;clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
+            --extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=FALSE" \
+            --extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=FALSE" \
             --cross-compile-append-host-target-to-destdir=False
+
+        # THREADS_PREFER_PTHREAD_FLAG=OFF is needed to prevent adding the -pthread flag, which fails on Android
 
         swiftc=$(find ${build_dir}/swift -name 'swiftc' | grep -v bootstrapping)
         lld=$(find ${build_dir}/swift -name 'ld.lld')
