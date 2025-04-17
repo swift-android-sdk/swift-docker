@@ -43,6 +43,6 @@ jobs:
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |
-          apt install ninja-build
+          sudo apt install ninja-build
           ./build
 
