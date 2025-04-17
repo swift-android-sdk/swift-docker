@@ -10,6 +10,30 @@ API=28
 SDKROOT=${TMPDIR:-/tmp}/swift-android-sdk
 mkdir -p ${SDKROOT}
 
+# Install a Swift host toolchain if it isn't already present
+SWIFT_ROOT=${SDKROOT}/host-toolchain
+HOST_ARCH=ubuntu24.04
+SWIFT_VERSION=6.1
+SWIFT_TAG="swift-${SWIFT_VERSION}-RELEASE"
+SWIFT_BRANCH="swift-$(echo $SWIFT_TAG | cut -d- -f2)-release"
+SWIFT_BASE=$SWIFT_TAG-$HOST_ARCH
+
+if [[ ! -d $SWIFT_ROOT ]]; then
+    mkdir -p $SWIFT_ROOT
+    pushd $SWIFT_ROOT
+
+
+    SWIFT_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_ARCH | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
+    wget -q $SWIFT_URL
+    tar xzf $SWIFT_BASE.tar.gz
+
+    popd
+fi
+
+$SWIFT_ROOT/$SWIFT_BASE/usr/bin/swift --version
+# ensure the correct Swift is first in the PATH
+export PATH=$SWIFT_ROOT/$SWIFT_BASE/usr/bin:$PATH
+
 # fetch the patches
 PATCHDIR=${SDKROOT}/patches
 if [[ ! -d ${PATCHDIR} ]]; then
