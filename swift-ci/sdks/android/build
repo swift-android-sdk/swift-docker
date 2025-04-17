@@ -61,16 +61,25 @@ if [[ ! -d ${PATCHDIR} ]]; then
     git clone https://github.com/finagolfin/swift-android-sdk.git ${PATCHDIR}
 fi
 
+# Apply patches
+# TODO: need to selectively apply patches based on release or not release
 pushd ${SDKROOT}/src/swift-project
-    # TODO: need to selectively apply patches based on release or not release
+    # patch the patch, which seems to only be needed for an API less than 28 
+    # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
+    perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $PATCHDIR/swift-android.patch
+
+    echo "### PATCH: $PATCHDIR/swift-android.patch"
+    cat $PATCHDIR/swift-android.patch
+
     git apply $PATCHDIR/swift-android.patch || true
     git apply -C1 $PATCHDIR/swift-android-ci.patch || true
 
-    # need to un-apply libandroid-spawn since we don't need it for API ???+
+    # need to un-apply libandroid-spawn since we don't need it for API28+
     perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
     perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+
     # fix for Process.swift:953:57: error: value of optional type 'posix_spawnattr_t?' (aka 'Optional<OpaquePointer>') must be unwrapped to a value of type 'posix_spawnattr_t' (aka 'OpaquePointer')
-    perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
+    #perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
 
     git apply $PATCHDIR/swift-android-ci-release.patch || true
     git apply $PATCHDIR/swift-android-testing-release.patch || true

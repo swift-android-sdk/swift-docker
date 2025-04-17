@@ -219,8 +219,8 @@ function run() {
     "$@"
 }
 
-#HOST=linux-x86_64
-HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+HOST=linux-x86_64
+#HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 
 ndktoolchain=$ndk_home/toolchains/llvm/prebuilt/$HOST
 
