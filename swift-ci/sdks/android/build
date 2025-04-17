@@ -3,10 +3,12 @@
 
 # the architecture(s) to build; on GH Actions we build everything
 if [[ -z "${CI}" ]]; then
+    #TARGET_ARCHS=${TARGET_ARCHS:-x86_64,aarch64}
     TARGET_ARCHS=${TARGET_ARCHS:-aarch64}
 else
     #TARGET_ARCHS=${TARGET_ARCHS:-aarch64,armv7,x86_64,x86}
-    TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64}
+    #TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64}
+    TARGET_ARCHS=${TARGET_ARCHS:-x86_64,aarch64}
 fi
 
 ANDROID_NDK_VERSION=android-ndk-r27c

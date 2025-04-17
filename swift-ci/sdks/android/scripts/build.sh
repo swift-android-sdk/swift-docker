@@ -102,7 +102,7 @@ android_sdk_version=0.1
 sdk_name=
 archs=aarch64,armv7,x86_64,x86
 android_api=28
-build_type=RelWithDebInfo
+build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
 source_dir=
 ndk_home=${ANDROID_NDK}
@@ -359,21 +359,6 @@ for arch in $archs; do
             --xctest --install-xctest \
             --swift-testing --install-swift-testing \
             --cross-compile-append-host-target-to-destdir=False
-
-            #--llbuild --install-llbuild \
-            #--swiftpm \
-            #--sourcekit-lsp \
-
-            #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=YES" \
-            #--extra-cmake-options="-DTHREADS_PREFER_PTHREAD_FLAG=OFF" \
-            #--extra-cmake-options="-DCMAKE_THREAD_PREFER_PTHREAD=OFF" \
-            #--extra-cmake-options="-DCMAKE_HAVE_LIBC_PTHREAD=ON" \
-
-        # THREADS_PREFER_PTHREAD_FLAG=OFF is needed to prevent adding the -pthread flag, which fails on Android
-        #swiftc=$(find ${build_dir}/swift -name 'swiftc' | grep -v bootstrapping)
-        #lld=$(find ${build_dir}/swift -name 'ld.lld')
-        #echo "built: ${swiftc}"
-
     quiet_popd
 done
 
