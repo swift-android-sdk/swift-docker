@@ -340,9 +340,9 @@ for arch in $archs; do
             --reconfigure \
             --no-assertions \
             --android \
-            --android-ndk $ndk_home \
-            --android-arch $arch \
-            --android-api-level $android_api \
+            --android-ndk=$ndk_home \
+            --android-arch=$arch \
+            --android-api-level=$android_api \
             --native-swift-tools-path=$host_toolchain/bin \
             --native-clang-tools-path=$host_toolchain/bin \
             --cross-compile-hosts=android-$arch \
@@ -360,5 +360,7 @@ for arch in $archs; do
             --swift-testing --install-swift-testing \
             --cross-compile-append-host-target-to-destdir=False
     quiet_popd
+
+    header "Completed build for $arch in $sdk_root"
 done
 
