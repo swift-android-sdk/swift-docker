@@ -40,7 +40,6 @@ usage: fetch-source.sh [--swift-scheme <scheme>|--swift-tag <tag>
                                                |--swift-version <version>]
                        [--curl-version <version>]
                        [--boringssl-version <version>]
-                       [--zlib-version <version>]
                        [--clone-with-ssh]
                        [--source-dir <path>]
 
@@ -60,8 +59,6 @@ SDK for Swift.  Options are:
   --libxml2-version <version>
   --curl-version <version>
   --boringssl-version <version>
-  --zlib-version <version>
-                      Select the versions of other dependencies.
 EOF
 }
 
@@ -70,16 +67,13 @@ if [[ -z "${SWIFT_VERSION}" ]]; then
     SWIFT_VERSION=scheme:release/6.1
 fi
 if [[ -z "${LIBXML2_VERSION}" ]]; then
-    LIBXML2_VERSION=2.12.7
+    LIBXML2_VERSION=2.14.2
 fi
 if [[ -z "${CURL_VERSION}" ]]; then
-    CURL_VERSION=8.7.1
+    CURL_VERSION=8.13.0
 fi
 if [[ -z "${BORINGSSL_VERSION}" ]]; then
     BORINGSSL_VERSION=fips-20220613
-fi
-if [[ -z "${ZLIB_VERSION}" ]]; then
-    ZLIB_VERSION=1.3.1
 fi
 
 clone_with_ssh=false
@@ -97,8 +91,6 @@ while [ "$#" -gt 0 ]; do
             CURL_VERSION="$2"; shift ;;
         --boringssl-version)
             BORINGSSL_VERSION="$2"; shift ;;
-        --zlib-version)
-            ZLIB_VERSION="$2"; shift ;;
         --clone-with-ssh)
             clone_with_ssh=true ;;
         --source-dir)
@@ -164,7 +156,7 @@ pushd curl >/dev/null 2>&1
 git checkout curl-$(echo ${CURL_VERSION} | tr '.' '_')
 popd >/dev/null 2>&1
 
-# Fetch BoringSSL (also can't clone using ssh)
+# Fetch BoringSSL
 header "Fetching BoringSSL"
 
 [[ -d boringssl ]] || git clone https://boringssl.googlesource.com/boringssl
@@ -172,10 +164,3 @@ pushd boringssl >/dev/null 2>&1
 git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
 
-# Fetch zlib
-header "Fetching zlib"
-
-[[ -d zlib ]] || git clone ${github}madler/zlib.git
-pushd zlib >/dev/null 2>&1
-git checkout v${ZLIB_VERSION}
-popd >/dev/null 2>&1
