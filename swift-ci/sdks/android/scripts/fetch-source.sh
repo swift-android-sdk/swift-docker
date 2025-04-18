@@ -34,6 +34,20 @@ function header {
     echo ""
 }
 
+function groupstart {
+    local text="$1"
+    if [[ ! -z "$CI" ]]; then
+        echo "::group::${text}"
+    fi
+    header $text
+}
+
+function groupend {
+    if [[ ! -z "$CI" ]]; then
+        echo "::endgroup::"
+    fi
+}
+
 function usage {
     cat <<EOF
 usage: fetch-source.sh [--swift-scheme <scheme>|--swift-tag <tag>
@@ -120,9 +134,9 @@ fi
 cd "$source_dir"
 
 # Fetch Swift
-header "Fetching Swift"
-
 mkdir -p swift-project
+
+groupstart "Fetching Swift"
 pushd swift-project >/dev/null
 
 [[ -d swift ]] || git clone ${github}apple/swift.git
@@ -141,28 +155,28 @@ else
 fi
 
 popd >/dev/null
+groupend
 
 # Fetch libxml2
-header "Fetching libxml2"
-
+groupstart "Fetching libxml2"
 [[ -d libxml2 ]] || git clone ${github}GNOME/libxml2.git
 pushd libxml2 >/dev/null 2>&1
 git checkout v${LIBXML2_VERSION}
 popd >/dev/null 2>&1
+groupend
 
 # Fetch curl
-header "Fetching curl"
-
-[[ -d curl ]] || git clone ${github}curl/curl.git
+groupstart "Fetching curl"
 pushd curl >/dev/null 2>&1
 git checkout curl-$(echo ${CURL_VERSION} | tr '.' '_')
 popd >/dev/null 2>&1
+groupend
 
 # Fetch BoringSSL
-header "Fetching BoringSSL"
-
+groupstart "Fetching BoringSSL"
 [[ -d boringssl ]] || git clone https://boringssl.googlesource.com/boringssl
 pushd boringssl >/dev/null 2>&1
 git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
+groupend
 

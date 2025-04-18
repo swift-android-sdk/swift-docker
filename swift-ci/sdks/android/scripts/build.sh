@@ -1,6 +1,6 @@
 #!/bin/bash
 # Swift SDK for Android: Build Script
-set -ex
+set -e
 
 # Docker sets TERM to xterm if using a pty; we probably want
 # xterm-256color, otherwise we only get eight colors
@@ -37,7 +37,7 @@ function header {
 function groupstart {
     local text="$1"
     if [[ ! -z "$CI" ]]; then 
-        echo "::group::{${text}}"
+        echo "::group::${text}"
     fi
     header $text
 }
