@@ -2,7 +2,7 @@
 # Swift Android SDK: Top-level Build Script
 
 # default architectures to build for
-TARGET_ARCHS=${TARGET_ARCHS:-armv7,aarch64,x86_64}
+TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
@@ -90,4 +90,7 @@ pushd ${SDKROOT}/src/swift-project
 popd
 
 ./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs $TARGET_ARCHS
+
+# assemble the artifactbundle
+#./scripts/assemble.sh --products-dir ${SDKROOT}/products --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --archs $TARGET_ARCHS
 
