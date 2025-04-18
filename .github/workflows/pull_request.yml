@@ -35,12 +35,12 @@ jobs:
         run: ./build
 
    android-build:
-     #name: Build Android ${{ matrix.arch }}
-     #strategy:
-       #fail-fast: false
-       #matrix:
-         #arch: [armv7,aarch64,x86_64]
-     name: Build Android SDK
+     name: Build Android ${{ matrix.arch }} SDK
+     strategy:
+       fail-fast: false
+       matrix:
+         arch: [armv7,aarch64,x86_64]
+     #name: Build Android SDK
      runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
@@ -49,6 +49,6 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: |
           sudo apt install ninja-build
-          #TARGET_ARCHS=${{ matrix.arch }} ./build
-          ./build
+          TARGET_ARCHS=${{ matrix.arch }} ./build
+          #./build
 

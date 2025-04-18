@@ -77,7 +77,8 @@ pushd ${SDKROOT}/src/swift-project
     #perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
 
     git apply $PATCHDIR/swift-android.patch || true
-    git apply -C1 $PATCHDIR/swift-android-ci.patch || true
+    # swift-android-ci.patch is not needed, since it is only used for llbuild, etc.
+    #git apply -C1 $PATCHDIR/swift-android-ci.patch || true
 
     # need to un-apply libandroid-spawn since we don't need it for API28+
     perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
@@ -89,8 +90,5 @@ pushd ${SDKROOT}/src/swift-project
     perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
 popd
 
-./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs $TARGET_ARCHS
-
-# assemble the artifactbundle
-#./scripts/assemble.sh --products-dir ${SDKROOT}/products --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --archs $TARGET_ARCHS
+./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs ${TARGET_ARCHS}
 

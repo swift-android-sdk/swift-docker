@@ -224,6 +224,11 @@ function run() {
 }
 
 for arch in $archs; do
+    # enable short-circuiting the individual builds
+    if [[ ! -z "$SKIP_ARCH_BUILD" ]]; then
+        continue
+    fi
+
     case $arch in
         armv7) target_host="arm-linux-androideabi"; compiler_target_host="armv7a-linux-androideabi$android_api"; android_abi="armeabi-v7a" ;;
         aarch64) target_host="aarch64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="arm64-v8a" ;;
@@ -365,4 +370,101 @@ for arch in $archs; do
 
     header "Completed build for $arch in $sdk_root"
 done
+
+# Now generate the bundle
+header "Bundling SDK"
+
+sdk_name=swift-${swift_version}_static-linux-${static_linux_sdk_version}
+bundle="${sdk_name}.artifactbundle"
+
+rm -rf "${build_dir}/$bundle"
+mkdir -p "${build_dir}/$bundle/$sdk_name/swift-linux-musl"
+
+quiet_pushd ${build_dir}/$bundle
+
+# First the info.json, for SwiftPM
+cat > info.json <<EOF
+{
+  "schemaVersion": "1.0",
+  "artifacts": {
+    "$sdk_name": {
+      "variants": [
+        {
+          "path": "$sdk_name/swift-linux-musl"
+        }
+      ],
+      "version": "0.0.1",
+      "type": "swiftSDK"
+    }
+  }
+}
+EOF
+
+
+cd "$sdk_name/swift-linux-musl"
+
+cat > swift-sdk.json <<EOF
+{
+  "schemaVersion": "4.0",
+  "targetTriples": {
+EOF
+
+first=true
+for arch in $archs; do
+    if [[ "$first" == "true" ]]; then
+        first=false
+    else
+        cat >> swift-sdk.json <<EOF
+    },
+EOF
+    fi
+    cat >> swift-sdk.json <<EOF
+    "${arch}-swift-linux-musl": {
+      "toolsetPaths": [
+        "toolset.json"
+      ],
+      "sdkRootPath": "musl-${musl_version}.sdk/${arch}",
+      "swiftResourcesPath": "musl-${musl_version}.sdk/${arch}/usr/lib/swift_static",
+      "swiftStaticResourcesPath": "musl-${musl_version}.sdk/${arch}/usr/lib/swift_static"
+EOF
+done
+
+cat >> swift-sdk.json <<EOF
+    }
+  }
+}
+EOF
+
+mkdir "musl-${musl_version}.sdk"
+quiet_pushd "musl-${musl_version}.sdk"
+cp -R ${build_dir}/sdk_root/* .
+quiet_popd
+
+mkdir -p swift.xctoolchain/usr/bin
+
+cat > toolset.json <<EOF
+{
+  "rootPath": "swift.xctoolchain/usr/bin",
+  "swiftCompiler" : {
+    "extraCLIOptions" : [
+      "-static-executable",
+      "-static-stdlib"
+    ]
+  },
+  "schemaVersion": "1.0"
+}
+EOF
+
+quiet_popd
+
+#tree ${build_dir}/$bundle
+#tree $products_dir
+
+#header "Outputting compressed bundle"
+
+#quiet_pushd "${build_dir}"
+#mkdir -p "${products_dir}"
+#tar cvzf "${products_dir}/${bundle}.tar.gz" "${bundle}"
+#quiet_popd
+
 
