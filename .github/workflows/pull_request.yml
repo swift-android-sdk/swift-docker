@@ -49,6 +49,11 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: |
           sudo apt install ninja-build
-          #TARGET_ARCHS=${{ matrix.arch }} ./build
           ./build
+          #TARGET_ARCHS=${{ matrix.arch }} ./build
+      - name: Upload SDK artifactbundle
+        uses: actions/upload-artifact@v4
+        with:
+          compression-level: 0
+          path: $RUNNER_TEMP/swift-android-sdk/products/*.artifactbundle.tar.gz
 

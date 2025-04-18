@@ -34,6 +34,20 @@ function header {
     echo ""
 }
 
+function groupstart {
+    local text="$1"
+    if [[ ! -z "$CI" ]]; then 
+        echo "::group::{${text}}"
+    fi
+    header $text
+}
+
+function groupend {
+    if [[ ! -z "$CI" ]]; then 
+        echo "::endgroup::"
+    fi
+}
+
 function usage {
     cat <<EOF
 usage: build.sh --source-dir <path> --products-dir <path> --ndk-home <path> --host-toolchain <path>
@@ -225,7 +239,7 @@ function run() {
 
 for arch in $archs; do
     # enable short-circuiting the individual builds
-    if [[ ! -z "$SKIP_ARCH_BUILD" ]]; then
+    if [[ ! -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
         continue
     fi
 
@@ -240,7 +254,7 @@ for arch in $archs; do
     sdk_root=${build_dir}/sdk_root/${arch}
     mkdir -p "$sdk_root"
 
-    header "Building libxml2 for $arch"
+    groupstart "Building libxml2 for $arch"
     quiet_pushd ${source_dir}/libxml2
         run cmake \
             -G Ninja \
@@ -269,8 +283,9 @@ for arch in $archs; do
             run ninja -j$parallel_jobs install
         quiet_popd
     quiet_popd
+    groupend
 
-    header "Building boringssl for ${compiler_target_host}"
+    groupstart "Building boringssl for ${compiler_target_host}"
     quiet_pushd ${source_dir}/boringssl
         run cmake \
             -GNinja \
@@ -293,8 +308,9 @@ for arch in $archs; do
             run ninja -j$parallel_jobs install
         quiet_popd
     quiet_popd
+    groupend
 
-    header "Building libcurl for ${compiler_target_host}"
+    groupstart "Building libcurl for ${compiler_target_host}"
     quiet_pushd ${source_dir}/curl
         run cmake \
             -G Ninja \
@@ -329,8 +345,9 @@ for arch in $archs; do
             run ninja -j$parallel_jobs install
         quiet_popd
     quiet_popd
+    groupend
 
-    header "Building Android SDK for ${compiler_target_host}"
+    groupstart "Building Android SDK for ${compiler_target_host}"
     quiet_pushd ${source_dir}/swift-project
         build_type_flag="--debug"
         case $build_type in
@@ -375,18 +392,20 @@ for arch in $archs; do
             #--clean-install-destdir \
             #--clean \
     quiet_popd
-
-    header "Completed build for $arch in $sdk_root"
+    groupend
 done
 
 # Now generate the bundle
-header "Bundling SDK"
+groupstart "Bundling SDK"
 
-sdk_name=swift-${swift_version}_static-linux-${static_linux_sdk_version}
+sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
+#sdk_base=android-27c-sysroot
+sdk_base=swift-android
+
 bundle="${sdk_name}.artifactbundle"
 
 rm -rf "${build_dir}/$bundle"
-mkdir -p "${build_dir}/$bundle/$sdk_name/swift-linux-musl"
+mkdir -p "${build_dir}/$bundle/$sdk_name/$sdk_base"
 
 quiet_pushd ${build_dir}/$bundle
 
@@ -398,7 +417,7 @@ cat > info.json <<EOF
     "$sdk_name": {
       "variants": [
         {
-          "path": "$sdk_name/swift-linux-musl"
+          "path": "$sdk_name/$sdk_base"
         }
       ],
       "version": "0.0.1",
@@ -409,7 +428,7 @@ cat > info.json <<EOF
 EOF
 
 
-cd "$sdk_name/swift-linux-musl"
+cd "$sdk_name/$sdk_base"
 
 cat > swift-sdk.json <<EOF
 {
@@ -427,7 +446,7 @@ for arch in $archs; do
 EOF
     fi
     cat >> swift-sdk.json <<EOF
-    "${arch}-swift-linux-musl": {
+    "${arch}-${sdk_base}": {
       "toolsetPaths": [
         "toolset.json"
       ],
@@ -465,14 +484,14 @@ EOF
 
 quiet_popd
 
-#tree ${build_dir}/$bundle
-#tree $products_dir
+if [[ -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
+    header "Outputting compressed bundle"
 
-#header "Outputting compressed bundle"
+    quiet_pushd "${build_dir}"
+        mkdir -p "${products_dir}"
+        tar cvzf "${products_dir}/${bundle}.tar.gz" "${bundle}"
+    quiet_popd
+fi
 
-#quiet_pushd "${build_dir}"
-#mkdir -p "${products_dir}"
-#tar cvzf "${products_dir}/${bundle}.tar.gz" "${bundle}"
-#quiet_popd
-
+groupend
 
