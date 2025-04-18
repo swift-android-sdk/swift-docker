@@ -342,10 +342,14 @@ for arch in $archs; do
         # use an out-of-tree build folder, otherwise subsequent arch builds have conflicts
         export SWIFT_BUILD_ROOT=${build_dir}/$arch/swift-project
 
+        # need to remove symlink that gets created in the NDK to the previous arch's build
+        # or else we get errors like:
+        # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
+        rm -f $ndk_toolchain/sysroot/usr/lib/swift
+
         ./swift/utils/build-script \
             $build_type_flag \
             --reconfigure \
-            --clean \
             --no-assertions \
             --android \
             --android-ndk=$ndk_home \
@@ -369,6 +373,7 @@ for arch in $archs; do
             --cross-compile-append-host-target-to-destdir=False
 
             #--clean-install-destdir \
+            #--clean \
     quiet_popd
 
     header "Completed build for $arch in $sdk_root"
