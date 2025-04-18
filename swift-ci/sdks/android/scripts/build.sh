@@ -346,7 +346,6 @@ for arch in $archs; do
             $build_type_flag \
             --reconfigure \
             --clean \
-            --clean-install-destdir \
             --no-assertions \
             --android \
             --android-ndk=$ndk_home \
@@ -368,6 +367,8 @@ for arch in $archs; do
             --xctest --install-xctest \
             --swift-testing --install-swift-testing \
             --cross-compile-append-host-target-to-destdir=False
+
+            #--clean-install-destdir \
     quiet_popd
 
     header "Completed build for $arch in $sdk_root"
