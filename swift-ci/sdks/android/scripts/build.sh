@@ -345,6 +345,8 @@ for arch in $archs; do
         ./swift/utils/build-script \
             $build_type_flag \
             --reconfigure \
+            --clean \
+            --clean-install-destdir \
             --no-assertions \
             --android \
             --android-ndk=$ndk_home \
