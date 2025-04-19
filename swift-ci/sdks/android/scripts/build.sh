@@ -453,7 +453,7 @@ EOF
         "swift-toolset.json"
       ],
       "sdkRootPath": "${sdk_root}/${arch}",
-      "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",
+      "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift",
       "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static"
 EOF
 done
