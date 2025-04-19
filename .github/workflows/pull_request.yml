@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           compression-level: 0
-          path: $RUNNER_TEMP/swift-android-sdk/products/*.artifactbundle.tar.gz
+          path: ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz
       - name: Install SDK Locally
         run:
           $RUNNER_TEMP/host-toolchain/*/usr/bin/swift sdk install $RUNNER_TEMP/swift-android-sdk/products/*.artifactbundle.tar.gz
