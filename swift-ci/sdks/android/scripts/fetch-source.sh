@@ -167,6 +167,7 @@ groupend
 
 # Fetch curl
 groupstart "Fetching curl"
+[[ -d curl ]] || git clone ${github}curl/curl.git
 pushd curl >/dev/null 2>&1
 git checkout curl-$(echo ${CURL_VERSION} | tr '.' '_')
 popd >/dev/null 2>&1
