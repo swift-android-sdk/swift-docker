@@ -57,21 +57,29 @@ jobs:
 
           # build arch specified by the matrix
           #TARGET_ARCHS=${{ matrix.arch }} ./build
+      - name: Get artifact info
+        id: paths
+        run: |
+          echo "swift-path=$(ls ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift)" >> $GITHUB_OUTPUT
+          echo "artifact-name=$(basename ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
+          echo "artifact-path=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:
           compression-level: 0
-          path: ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz
+          name: ${{ steps.paths.outputs.artifact-name }}
+          path: ${{ steps.paths.outputs.artifact-path }}
       - name: Install SDK Locally
         run:
-          $RUNNER_TEMP/swift-android-sdk/host-toolchain/*/usr/bin/swift sdk install $RUNNER_TEMP/swift-android-sdk/products/*.artifactbundle.tar.gz
+          ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
       - name: Build Demo Project
         run: |
           cd $RUNNER_TEMP
           mkdir DemoProject
           cd DemoProject
-          $RUNNER_TEMP/swift-android-sdk/host-toolchain/*/usr/bin/swift package init
-          $RUNNER_TEMP/swift-android-sdk/host-toolchain/*/usr/bin/swift build --build-tests --sdk --swift-sdk aarch64-unknown-linux-android28
+          ${{ steps.paths.outputs.swift-path }} --version
+          ${{ steps.paths.outputs.swift-path }} package init
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --sdk --swift-sdk x86_64-unknown-linux-android28
       - name: Test Swift Package on Android
         # TODO: need to implement installed-sdk option in swift-android-action
         if: false
