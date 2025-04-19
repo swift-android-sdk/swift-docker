@@ -401,6 +401,8 @@ groupstart "Bundling SDK"
 sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
 #sdk_base=android-27c-sysroot
 sdk_base=swift-android
+#sdk_root="${sdk_base}-${android_sdk_version}.sdk"
+sdk_root="${sdk_base}.sdk"
 
 bundle="${sdk_name}.artifactbundle"
 
@@ -420,7 +422,7 @@ cat > info.json <<EOF
           "path": "$sdk_name/$sdk_base"
         }
       ],
-      "version": "0.0.1",
+      "version": "${android_sdk_version}",
       "type": "swiftSDK"
     }
   }
@@ -448,11 +450,11 @@ EOF
     cat >> swift-sdk.json <<EOF
     "${arch}-${sdk_base}": {
       "toolsetPaths": [
-        "toolset.json"
+        "swift-toolset.json"
       ],
-      "sdkRootPath": "musl-${musl_version}.sdk/${arch}",
-      "swiftResourcesPath": "musl-${musl_version}.sdk/${arch}/usr/lib/swift_static",
-      "swiftStaticResourcesPath": "musl-${musl_version}.sdk/${arch}/usr/lib/swift_static"
+      "sdkRootPath": "${sdk_root}/${arch}",
+      "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",
+      "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static"
 EOF
 done
 
@@ -462,22 +464,15 @@ cat >> swift-sdk.json <<EOF
 }
 EOF
 
-mkdir "musl-${musl_version}.sdk"
-quiet_pushd "musl-${musl_version}.sdk"
+mkdir "${sdk_root}"
+quiet_pushd "${sdk_root}"
 cp -R ${build_dir}/sdk_root/* .
 quiet_popd
 
-mkdir -p swift.xctoolchain/usr/bin
-
-cat > toolset.json <<EOF
+cat > swift-toolset.json <<EOF
 {
-  "rootPath": "swift.xctoolchain/usr/bin",
-  "swiftCompiler" : {
-    "extraCLIOptions" : [
-      "-static-executable",
-      "-static-stdlib"
-    ]
-  },
+  "cCompiler": { "extraCLIOptions": ["-fPIC"] },
+  "swiftCompiler": { "extraCLIOptions": ["-Xclang-linker", "-fuse-ld=lld"] },
   "schemaVersion": "1.0"
 }
 EOF
