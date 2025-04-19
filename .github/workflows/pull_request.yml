@@ -48,7 +48,7 @@ jobs:
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |
-          sudo apt -q install ninja-build
+          sudo apt install -q ninja-build
           ./build
           #TARGET_ARCHS=${{ matrix.arch }} ./build
       - name: Upload SDK artifactbundle

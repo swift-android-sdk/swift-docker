@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 # Swift Android SDK: Top-level Build Script
 
 # default architectures to build for
