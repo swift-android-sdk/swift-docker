@@ -9,6 +9,7 @@ jobs:
    build:
      name: Build Docker images
      runs-on: ubuntu-latest
+     if: false
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,6 +26,7 @@ jobs:
    static-linux-build:
      name: Build Static Linux image
      runs-on: ubuntu-latest
+     if: false
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,13 +35,58 @@ jobs:
         run: ./build
 
    android-build:
-     name: Build Android image
-     runs-on: ubuntu-latest
-     if: false
+     #name: Build Android ${{ matrix.arch }} SDK
+     #strategy:
+       #fail-fast: false
+       #matrix:
+       #  arch: [armv7,aarch64,x86_64]
+     name: Build Android SDK
+     runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Build Docker images
+      - name: Build Android SDK
         working-directory: swift-ci/sdks/android
-        run: ./build
+        run: |
+          sudo apt install -q ninja-build
+          # build all architectures
+          #./build
+
+          # just build x86_64 for testing
+          TARGET_ARCHS=x86_64 ./build
+
+          # build arch specified by the matrix
+          #TARGET_ARCHS=${{ matrix.arch }} ./build
+      - name: Get artifact info
+        id: paths
+        run: |
+          echo "swift-path=$(ls ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift)" >> $GITHUB_OUTPUT
+          echo "artifact-name=$(basename ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
+          echo "artifact-path=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
+      - name: Upload SDK artifactbundle
+        uses: actions/upload-artifact@v4
+        with:
+          compression-level: 0
+          name: ${{ steps.paths.outputs.artifact-name }}
+          path: ${{ steps.paths.outputs.artifact-path }}
+      - name: Install SDK
+        run: |
+          ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
+          ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-swift-android
+      - name: Build Demo Project
+        run: |
+          cd ${{ runner.temp }}
+          mkdir DemoProject
+          cd DemoProject
+          ${{ steps.paths.outputs.swift-path }} --version
+          ${{ steps.paths.outputs.swift-path }} package init
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-swift-android
+      - name: Test Swift Package on Android
+        # TODO: need to implement installed-sdk option in swift-android-action
+        if: false
+        uses: skiptools/swift-android-action@main
+        with:
+          package-path: ${{ runner.temp }}/DemoProject
+          installed-sdk: x86_64-swift-android
+          installed-swift: ${{ steps.paths.outputs.swift-path }}
 
