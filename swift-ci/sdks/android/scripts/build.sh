@@ -359,11 +359,6 @@ for arch in $archs; do
         # use an out-of-tree build folder, otherwise subsequent arch builds have conflicts
         export SWIFT_BUILD_ROOT=${build_dir}/$arch/swift-project
 
-        # need to remove symlink that gets created in the NDK to the previous arch's build
-        # or else we get errors like:
-        # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
-        rm -f $ndk_toolchain/sysroot/usr/lib/swift
-
         ./swift/utils/build-script \
             $build_type_flag \
             --reconfigure \
@@ -391,6 +386,12 @@ for arch in $archs; do
 
             #--clean-install-destdir \
             #--clean \
+
+
+        # need to remove symlink that gets created in the NDK to the previous arch's build
+        # or else we get errors like:
+        # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
+        rm -f $ndk_toolchain/sysroot/usr/lib/swift
     quiet_popd
     groupend
 done
@@ -400,7 +401,8 @@ groupstart "Bundling SDK"
 
 sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
 #sdk_base=android-27c-sysroot
-sdk_base=swift-android
+#sdk_base=swift-unknown-android
+sdk_base=unknown-linux-android
 #sdk_root="${sdk_base}-${android_sdk_version}.sdk"
 sdk_root="${sdk_base}.sdk"
 
@@ -432,6 +434,8 @@ EOF
 
 cd "$sdk_name/$sdk_base"
 
+cp -a ${ndk_toolchain}/sysroot sysroot
+
 cat > swift-sdk.json <<EOF
 {
   "schemaVersion": "4.0",
@@ -449,12 +453,11 @@ EOF
     fi
     cat >> swift-sdk.json <<EOF
     "${arch}-${sdk_base}": {
-      "toolsetPaths": [
-        "swift-toolset.json"
-      ],
-      "sdkRootPath": "${sdk_root}/${arch}",
+      "sdkRootPath": "sysroot",
+      "sdkRootPathXXX": "${sdk_root}/${arch}",
       "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift",
-      "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static"
+      "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",
+      "toolsetPaths": [ "swift-toolset.json" ]
 EOF
 done
 
