@@ -402,7 +402,7 @@ groupstart "Bundling SDK"
 sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
 #sdk_base=android-27c-sysroot
 #sdk_base=swift-unknown-android
-sdk_base=unknown-linux-android
+sdk_base=linux-android
 #sdk_root="${sdk_base}-${android_sdk_version}.sdk"
 sdk_root="${sdk_base}.sdk"
 
@@ -434,7 +434,7 @@ EOF
 
 cd "$sdk_name/$sdk_base"
 
-cp -a ${ndk_toolchain}/sysroot sysroot
+cp -a ${ndk_toolchain}/sysroot ndk-sysroot
 
 cat > swift-sdk.json <<EOF
 {
@@ -443,22 +443,23 @@ cat > swift-sdk.json <<EOF
 EOF
 
 first=true
-for arch in $archs; do
-    if [[ "$first" == "true" ]]; then
-        first=false
-    else
-        cat >> swift-sdk.json <<EOF
+for api in $(eval echo "{$android_api..35}"); do
+    for arch in $archs; do
+        if [[ "$first" == "true" ]]; then
+            first=false
+        else
+            cat >> swift-sdk.json <<EOF
     },
 EOF
-    fi
-    cat >> swift-sdk.json <<EOF
-    "${arch}-${sdk_base}": {
-      "sdkRootPath": "sysroot",
-      "sdkRootPathXXX": "${sdk_root}/${arch}",
+        fi
+        cat >> swift-sdk.json <<EOF
+    "${arch}-${sdk_base}${api}": {
+      "sdkRootPath": "ndk-sysroot",
       "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift",
       "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",
       "toolsetPaths": [ "swift-toolset.json" ]
 EOF
+    done
 done
 
 cat >> swift-sdk.json <<EOF
