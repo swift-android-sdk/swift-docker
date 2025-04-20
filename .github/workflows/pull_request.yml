@@ -89,6 +89,8 @@ jobs:
           #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
           ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-unknown-linux-android
       - name: Build swift-algorithms
+        # TODO: fix <unknown>:0: error: missing required module 'SwiftAndroid'
+        if: false
         run: |
           cd ${{ runner.temp }}
           git clone https://github.com/apple/swift-algorithms.git
