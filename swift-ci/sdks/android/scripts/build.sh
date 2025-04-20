@@ -402,7 +402,8 @@ groupstart "Bundling SDK"
 sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
 #sdk_base=android-27c-sysroot
 #sdk_base=swift-unknown-android
-sdk_base=linux-android
+#sdk_base=linux-android
+sdk_base=swift-android
 #sdk_root="${sdk_base}-${android_sdk_version}.sdk"
 sdk_root="${sdk_base}.sdk"
 
@@ -453,7 +454,7 @@ for api in $(eval echo "{$android_api..35}"); do
 EOF
         fi
         cat >> swift-sdk.json <<EOF
-    "${arch}-${sdk_base}${api}": {
+    "${arch}-unknown-linux-android${api}": {
       "sdkRootPath": "ndk-sysroot",
       "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift",
       "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",

@@ -80,27 +80,26 @@ jobs:
           cd DemoProject
           ${{ steps.paths.outputs.swift-path }} --version
           ${{ steps.paths.outputs.swift-path }} package init
-          echo 'import Foundation' >> Sources/DemoProject/DemoProject.swift
-          echo 'import FoundationEssentials' >> Sources/DemoProject/DemoProject.swift
-          echo 'import FoundationXML' >> Sources/DemoProject/DemoProject.swift
-          echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
-          echo 'import Concurrency' >> Sources/DemoProject/DemoProject.swift
-          echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
-          echo 'import Android' >> Sources/DemoProject/DemoProject.swift
-          #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-linux-android28
-          ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-linux-android28
+          #echo 'import Foundation' >> Sources/DemoProject/DemoProject.swift
+          #echo 'import FoundationEssentials' >> Sources/DemoProject/DemoProject.swift
+          #echo 'import FoundationXML' >> Sources/DemoProject/DemoProject.swift
+          #echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
+          #echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
+          #echo 'import Android' >> Sources/DemoProject/DemoProject.swift
+          #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
+          ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-unknown-linux-android28
       - name: Build swift-algorithms
         run: |
           cd ${{ runner.temp }}
           git clone https://github.com/apple/swift-algorithms.git
           cd swift-algorithms
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-linux-android28
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
       - name: Test Swift Package on Android
         # TODO: need to implement installed-sdk option in swift-android-action
         if: false
         uses: skiptools/swift-android-action@main
         with:
           package-path: ${{ runner.temp }}/DemoProject
-          installed-sdk: x86_64-linux-android28
+          installed-sdk: x86_64-unknown-linux-android28
           installed-swift: ${{ steps.paths.outputs.swift-path }}
 
