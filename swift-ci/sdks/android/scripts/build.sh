@@ -444,7 +444,9 @@ cat > swift-sdk.json <<EOF
 EOF
 
 first=true
-for api in $(eval echo "{$android_api..35}"); do
+# create targets for the supported API and higher,
+# as well as a blank API, which will be the NDK default
+for api in "" $(eval echo "{$android_api..36}"); do
     for arch in $archs; do
         if [[ "$first" == "true" ]]; then
             first=false

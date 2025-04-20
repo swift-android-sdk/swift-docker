@@ -72,7 +72,7 @@ jobs:
       - name: Install SDK
         run: |
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
-          ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-swift-android
+          ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android
       - name: Build Demo Project
         run: |
           cd ${{ runner.temp }}
@@ -86,20 +86,20 @@ jobs:
           #echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
           #echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           #echo 'import Android' >> Sources/DemoProject/DemoProject.swift
-          #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
-          ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-unknown-linux-android28
+          #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
+          ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-unknown-linux-android
       - name: Build swift-algorithms
         run: |
           cd ${{ runner.temp }}
           git clone https://github.com/apple/swift-algorithms.git
           cd swift-algorithms
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
       - name: Test Swift Package on Android
         # TODO: need to implement installed-sdk option in swift-android-action
         if: false
         uses: skiptools/swift-android-action@main
         with:
           package-path: ${{ runner.temp }}/DemoProject
-          installed-sdk: x86_64-unknown-linux-android28
+          installed-sdk: x86_64-unknown-linux-android
           installed-swift: ${{ steps.paths.outputs.swift-path }}
 
