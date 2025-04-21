@@ -80,17 +80,14 @@ jobs:
           cd DemoProject
           ${{ steps.paths.outputs.swift-path }} --version
           ${{ steps.paths.outputs.swift-path }} package init
-          #echo 'import Foundation' >> Sources/DemoProject/DemoProject.swift
-          #echo 'import FoundationEssentials' >> Sources/DemoProject/DemoProject.swift
-          #echo 'import FoundationXML' >> Sources/DemoProject/DemoProject.swift
-          #echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
-          #echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
-          #echo 'import Android' >> Sources/DemoProject/DemoProject.swift
-          #${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
-          ${{ steps.paths.outputs.swift-path }} build --swift-sdk x86_64-unknown-linux-android
+          echo 'import Foundation' >> Sources/DemoProject/DemoProject.swift
+          echo 'import FoundationEssentials' >> Sources/DemoProject/DemoProject.swift
+          echo 'import FoundationXML' >> Sources/DemoProject/DemoProject.swift
+          echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
+          echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
+          echo 'import Android' >> Sources/DemoProject/DemoProject.swift
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
       - name: Build swift-algorithms
-        # TODO: fix <unknown>:0: error: missing required module 'SwiftAndroid'
-        if: false
         run: |
           cd ${{ runner.temp }}
           git clone https://github.com/apple/swift-algorithms.git
