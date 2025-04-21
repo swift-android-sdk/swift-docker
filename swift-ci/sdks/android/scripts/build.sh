@@ -384,10 +384,6 @@ for arch in $archs; do
             --swift-testing --install-swift-testing \
             --cross-compile-append-host-target-to-destdir=False
 
-            #--clean-install-destdir \
-            #--clean \
-
-
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:
         # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
@@ -432,15 +428,88 @@ cat > info.json <<EOF
 }
 EOF
 
+quiet_pushd "$sdk_name/$sdk_base"
 
-cd "$sdk_name/$sdk_base"
+#ndk_sysroot_path="ndk-sysroot"
+ndk_sysroot_path="android-27c-sysroot"
 
-cp -a ${ndk_toolchain}/sysroot ndk-sysroot
+cp -a ${ndk_toolchain}/sysroot ${ndk_sysroot_path}
+
+cat > $ndk_sysroot_path/SDKSettings.json <<EOF
+{
+  "DisplayName": "Swift Android SDK",
+  "Version": "${android_sdk_version}",
+  "VersionMap": {},
+  "CanonicalName": "linux-android"
+}
+EOF
+
 
 #quiet_pushd ndk-sysroot/usr/lib
 # FIXME: need to merge the multiple x86_64 archs
 #ln -s ../../../swift-android.sdk/x86_64/usr/lib/swift
 #quiet_popd
+
+#mkdir "${sdk_root}"
+#quiet_pushd "${sdk_root}"
+#cp -R ${build_dir}/sdk_root/* .
+#quiet_popd
+
+cp -a ${build_dir}/sdk_root sdk_root
+# Copy necessary headers and libraries from the toolchain and NDK clang resource directories
+SYSROOT=${ndk_sysroot_path}
+TOOLCHAIN=$host_toolchain
+mkdir -pv $SYSROOT/usr/lib/swift/clang/lib
+cp -rv $TOOLCHAIN/lib/clang/*/include $SYSROOT/usr/lib/swift/clang
+
+for arch in $archs; do
+    quiet_pushd sdk_root/${arch}/usr
+        rm -r bin
+        rm -r include/*
+        cp -r ${source_dir}/swift-project/swift/lib/ClangImporter/SwiftBridging/{module.modulemap,swift} include/
+
+        arch_triple="$arch-linux-android"
+        if [[ $arch == 'armv7' ]]; then
+            arch_triple="arm-linux-androideabi"
+        fi
+
+        sdk_root_arch=../../../sdk_root/$arch/usr
+
+        mkdir lib/${arch_triple}
+        mv $sdk_root_arch/lib/pkgconfig $sdk_root_arch/lib/swift/android/lib*.{a,so} lib/${arch_triple}
+
+        mv lib/swift_static lib/swift_static-$arch
+        mv lib/lib*.a lib/swift_static-$arch/android
+        rm -r lib/swift{,_static-$arch}/clang
+        mkdir -p lib/swift/clang/lib
+        cp -a ${ndk_toolchain}/lib/clang/*/lib/linux lib/swift/clang/lib
+        ln -s ../swift/clang lib/swift_static-$arch/clang
+    quiet_popd
+
+    # now sync the massaged sdk_root into the ndk_sysroot_path
+    rsync -a sdk_root/${arch}/usr ${ndk_sysroot_path}
+done
+
+rm -r ${ndk_sysroot_path}/usr/share/{doc,man}
+rm -r ${ndk_sysroot_path}/usr/{include,lib}/{i686,riscv64}-linux-android
+rm -r sdk_root
+
+# validate that some expected paths exists
+quiet_pushd ${ndk_sysroot_path}/usr
+    ls lib/swift/android
+    ls lib/swift/android/x86_64
+    ls lib/swift/android/x86_64/swiftrt.o
+
+    ls lib/swift_static-x86_64
+    ls lib/swift_static-x86_64/android
+    ls lib/swift_static-x86_64/android/libFoundationEssentials.a
+
+    ls lib/swift/clang/lib
+    ls lib/swift/clang/lib/linux
+    ls lib/swift/clang/lib/linux/x86_64
+    ls lib/swift/clang/lib/linux/x86_64/libunwind.a
+    ls lib/x86_64-linux-android/28/crtbegin_dynamic.o
+quiet_popd
 
 cat > swift-sdk.json <<EOF
 {
@@ -462,9 +531,9 @@ EOF
         fi
         cat >> swift-sdk.json <<EOF
     "${arch}-unknown-linux-android${api}": {
-      "sdkRootPath": "ndk-sysroot",
-      "swiftResourcesPath": "${sdk_root}/${arch}/usr/lib/swift",
-      "swiftStaticResourcesPath": "${sdk_root}/${arch}/usr/lib/swift_static",
+      "sdkRootPath": "${ndk_sysroot_path}",
+      "swiftResourcesPath": "${ndk_sysroot_path}/usr/lib/swift",
+      "swiftStaticResourcesPath": "${ndk_sysroot_path}/usr/lib/swift_static-${arch}",
       "toolsetPaths": [ "swift-toolset.json" ]
 EOF
     done
@@ -475,11 +544,6 @@ cat >> swift-sdk.json <<EOF
   }
 }
 EOF
-
-mkdir "${sdk_root}"
-quiet_pushd "${sdk_root}"
-cp -R ${build_dir}/sdk_root/* .
-quiet_popd
 
 cat > swift-toolset.json <<EOF
 {
