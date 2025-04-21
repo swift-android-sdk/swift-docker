@@ -48,7 +48,7 @@ jobs:
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |
-          sudo apt install -q ninja-build
+          sudo apt install -q ninja-build patchelf
           # build all architectures
           #./build
 
@@ -60,6 +60,7 @@ jobs:
       - name: Get artifact info
         id: paths
         run: |
+          echo "swift-root=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)" >> $GITHUB_OUTPUT
           echo "swift-path=$(ls ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift)" >> $GITHUB_OUTPUT
           echo "artifact-name=$(basename ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
           echo "artifact-path=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
@@ -73,7 +74,21 @@ jobs:
         run: |
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
           ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android
+      - name: Build swift-algorithms
+        run: |
+          cd ${{ runner.temp }}
+          git clone https://github.com/apple/swift-algorithms.git
+          cd swift-algorithms
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
+      - name: Test swift-algorithms on Android
+        uses: skiptools/swift-android-action@main
+        with:
+          #package-path: ${{ runner.temp }}/DemoProject
+          package-path: ${{ runner.temp }}/swift-algorithms
+          installed-sdk: x86_64-unknown-linux-android
+          installed-swift: ${{ steps.paths.outputs.swift-root }}
       - name: Build Demo Project
+        if: false
         run: |
           cd ${{ runner.temp }}
           mkdir DemoProject
@@ -87,18 +102,3 @@ jobs:
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
           ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
-      - name: Build swift-algorithms
-        run: |
-          cd ${{ runner.temp }}
-          git clone https://github.com/apple/swift-algorithms.git
-          cd swift-algorithms
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
-      - name: Test Swift Package on Android
-        # TODO: need to implement installed-sdk option in swift-android-action
-        if: false
-        uses: skiptools/swift-android-action@main
-        with:
-          package-path: ${{ runner.temp }}/DemoProject
-          installed-sdk: x86_64-unknown-linux-android
-          installed-swift: ${{ steps.paths.outputs.swift-path }}
-
