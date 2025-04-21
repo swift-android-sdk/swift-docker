@@ -50,13 +50,13 @@ jobs:
         run: |
           sudo apt install -q ninja-build patchelf
           # build all architectures
-          ./build
+          #./build
 
           # just build x86_64 for testing
           #TARGET_ARCHS=x86_64 ./build
 
           # build arch specified by the matrix
-          #TARGET_ARCHS=${{ matrix.arch }} ./build
+          TARGET_ARCHS=${{ matrix.arch }} ./build
       - name: Get artifact info
         id: paths
         run: |
@@ -70,6 +70,10 @@ jobs:
           compression-level: 0
           name: ${{ steps.paths.outputs.artifact-name }}
           path: ${{ steps.paths.outputs.artifact-path }}
+      - name: Cleanup
+        run: |
+          # need to free up some space or else when installing we get: No space left on device
+          rm -rf ${{ runner.temp }}/swift-android-sdk/{build,src}
       - name: Install SDK
         run: |
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
