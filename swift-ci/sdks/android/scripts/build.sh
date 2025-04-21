@@ -437,6 +437,11 @@ cd "$sdk_name/$sdk_base"
 
 cp -a ${ndk_toolchain}/sysroot ndk-sysroot
 
+#quiet_pushd ndk-sysroot/usr/lib
+# FIXME: need to merge the multiple x86_64 archs
+#ln -s ../../../swift-android.sdk/x86_64/usr/lib/swift
+#quiet_popd
+
 cat > swift-sdk.json <<EOF
 {
   "schemaVersion": "4.0",

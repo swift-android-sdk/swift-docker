@@ -52,7 +52,7 @@ mkdir -p ${SDKROOT}/products
 
 # Check-out the sources
 if [[ ! -d ${SDKROOT}/src ]]; then
-    scripts/fetch-source.sh --source-dir ${SDKROOT}/src
+    scripts/fetch-source.sh --source-dir ${SDKROOT}/src --swift-tag ${SWIFT_TAG}
 fi
 
 # fetch and apply the patches
