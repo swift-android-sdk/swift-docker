@@ -395,19 +395,13 @@ done
 # Now generate the bundle
 groupstart "Bundling SDK"
 
-sdk_name=swift-${swift_version}-android-${android_api}-${android_sdk_version}
-#sdk_base=android-27c-sysroot
-#sdk_base=swift-unknown-android
-#sdk_base=linux-android
 sdk_base=swift-android
-#sdk_root="${sdk_base}-${android_sdk_version}.sdk"
-sdk_root="${sdk_base}.sdk"
+sdk_staging="sdk_staging"
 
 bundle="${sdk_name}.artifactbundle"
 
-rm -rf "${build_dir}/$bundle"
-mkdir -p "${build_dir}/$bundle/$sdk_name/$sdk_base"
-
+rm -rf ${build_dir}/$bundle
+mkdir -p ${build_dir}/$bundle
 quiet_pushd ${build_dir}/$bundle
 
 # First the info.json, for SwiftPM
@@ -418,7 +412,7 @@ cat > info.json <<EOF
     "$sdk_name": {
       "variants": [
         {
-          "path": "$sdk_name/$sdk_base"
+          "path": "$sdk_base"
         }
       ],
       "version": "${android_sdk_version}",
@@ -428,14 +422,15 @@ cat > info.json <<EOF
 }
 EOF
 
-quiet_pushd "$sdk_name/$sdk_base"
+mkdir -p $sdk_base
+quiet_pushd $sdk_base
 
-#ndk_sysroot_path="ndk-sysroot"
-ndk_sysroot_path="android-27c-sysroot"
+#sysroot_path="ndk-sysroot"
+#sysroot_path="android-27c-sysroot"
+sysroot_path="sysroot"
+cp -a ${ndk_toolchain}/sysroot ${sysroot_path}
 
-cp -a ${ndk_toolchain}/sysroot ${ndk_sysroot_path}
-
-cat > $ndk_sysroot_path/SDKSettings.json <<EOF
+cat > $sysroot_path/SDKSettings.json <<EOF
 {
   "DisplayName": "Swift Android SDK",
   "Version": "${android_sdk_version}",
@@ -444,13 +439,13 @@ cat > $ndk_sysroot_path/SDKSettings.json <<EOF
 }
 EOF
 
-cp -a ${build_dir}/sdk_root sdk_root
+cp -a ${build_dir}/sdk_root ${sdk_staging}
 # Copy necessary headers and libraries from the toolchain and NDK clang resource directories
-mkdir -pv $ndk_sysroot_path/usr/lib/swift/clang/lib
-cp -rv $host_toolchain/lib/clang/*/include $ndk_sysroot_path/usr/lib/swift/clang
+mkdir -p $sysroot_path/usr/lib/swift/clang/lib
+cp -r $host_toolchain/lib/clang/*/include $sysroot_path/usr/lib/swift/clang
 
 for arch in $archs; do
-    quiet_pushd sdk_root/${arch}/usr
+    quiet_pushd ${sdk_staging}/${arch}/usr
         rm -r bin
         rm -r include/*
         cp -r ${source_dir}/swift-project/swift/lib/ClangImporter/SwiftBridging/{module.modulemap,swift} include/
@@ -473,16 +468,16 @@ for arch in $archs; do
         ln -s ../swift/clang lib/swift_static-$arch/clang
     quiet_popd
 
-    # now sync the massaged sdk_root into the ndk_sysroot_path
-    rsync -a sdk_root/${arch}/usr ${ndk_sysroot_path}
+    # now sync the massaged sdk_root into the sysroot_path
+    rsync -a ${sdk_staging}/${arch}/usr ${sysroot_path}
 done
 
-rm -r ${ndk_sysroot_path}/usr/share/{doc,man}
-rm -r ${ndk_sysroot_path}/usr/{include,lib}/{i686,riscv64}-linux-android
-rm -r sdk_root
+rm -r ${sysroot_path}/usr/share/{doc,man}
+rm -r ${sysroot_path}/usr/{include,lib}/{i686,riscv64}-linux-android
+rm -r ${sdk_staging}
 
 # validate that some expected paths exist
-quiet_pushd ${ndk_sysroot_path}/usr
+quiet_pushd ${sysroot_path}/usr
     ls lib/swift/android
     ls lib/swift/android/*
     ls lib/swift/android/*/swiftrt.o
@@ -507,7 +502,9 @@ EOF
 first=true
 # create targets for the supported API and higher,
 # as well as a blank API, which will be the NDK default
-for api in "" $(eval echo "{$android_api..36}"); do
+# FIXME: building against blank API doesn't work: ld.lld: error: cannot open crtbegin_dynamic.o: No such file or directory
+#for api in "" $(eval echo "{$android_api..36}"); do
+for api in $(eval echo "{$android_api..36}"); do
     for arch in $archs; do
         if [[ "$first" == "true" ]]; then
             first=false
@@ -518,9 +515,9 @@ EOF
         fi
         cat >> swift-sdk.json <<EOF
     "${arch}-unknown-linux-android${api}": {
-      "sdkRootPath": "${ndk_sysroot_path}",
-      "swiftResourcesPath": "${ndk_sysroot_path}/usr/lib/swift",
-      "swiftStaticResourcesPath": "${ndk_sysroot_path}/usr/lib/swift_static-${arch}",
+      "sdkRootPath": "${sysroot_path}",
+      "swiftResourcesPath": "${sysroot_path}/usr/lib/swift",
+      "swiftStaticResourcesPath": "${sysroot_path}/usr/lib/swift_static-${arch}",
       "toolsetPaths": [ "swift-toolset.json" ]
 EOF
     done

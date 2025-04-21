@@ -35,12 +35,12 @@ jobs:
         run: ./build
 
    android-build:
-     #name: Build Android ${{ matrix.arch }} SDK
-     #strategy:
-       #fail-fast: false
-       #matrix:
-       #  arch: [armv7,aarch64,x86_64]
-     name: Build Android SDK
+     name: Build Android ${{ matrix.arch }} SDK
+     strategy:
+       fail-fast: false
+       matrix:
+         arch: ['x86_64', 'armv7,aarch64,x86_64']
+     #name: Build Android SDK
      runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
@@ -79,13 +79,13 @@ jobs:
           cd ${{ runner.temp }}
           git clone https://github.com/apple/swift-algorithms.git
           cd swift-algorithms
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
       - name: Test swift-algorithms on Android
         uses: skiptools/swift-android-action@main
         with:
           #package-path: ${{ runner.temp }}/DemoProject
           package-path: ${{ runner.temp }}/swift-algorithms
-          installed-sdk: x86_64-unknown-linux-android
+          installed-sdk: x86_64-unknown-linux-android28
           installed-swift: ${{ steps.paths.outputs.swift-root }}
       - name: Build Demo Project
         if: false
@@ -101,4 +101,4 @@ jobs:
           echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
