@@ -9,7 +9,6 @@ jobs:
    build:
      name: Build Docker images
      runs-on: ubuntu-latest
-     if: false
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,7 +25,6 @@ jobs:
    static-linux-build:
      name: Build Static Linux image
      runs-on: ubuntu-latest
-     if: false
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,9 +37,11 @@ jobs:
      strategy:
        fail-fast: false
        matrix:
-         # build only x86_64 to speed up the validation
+         # blank arch builds all (aarch64,x86_64,armv7)
+         arch: ['']
+         # builds only x86_64 to speed up the validation
          #arch: ['x86_64']
-         arch: ['x86_64', '']
+         #arch: ['x86_64', '']
      runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
@@ -77,10 +77,8 @@ jobs:
 
           # There is no way to prevent even a single-file artifact from being zipped:
           # https://github.com/actions/upload-artifact?tab=readme-ov-file#zip-archives
-          # so we tack ".zip" on to the end of the name
-          ARTIFACT_NAME="${ARTIFACT_NAME}.zip"
-
-          # e.g.: swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz
+          # so the actual artifact download will look like:
+          # swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz.zip
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
           # validate some required paths in the artifactbundle
@@ -157,3 +155,4 @@ jobs:
           package-path: ${{ runner.temp }}/swift-algorithms
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+
