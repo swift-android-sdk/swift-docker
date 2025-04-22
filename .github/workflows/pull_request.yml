@@ -60,8 +60,9 @@ jobs:
       - name: Get artifact info
         id: paths
         run: |
-          echo "swift-root=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)" >> $GITHUB_OUTPUT
-          echo "swift-path=$(ls ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift)" >> $GITHUB_OUTPUT
+          SWIFT_ROOT=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)
+          echo "swift-root=${SWIFT_ROOT}" >> $GITHUB_OUTPUT
+          echo "swift-path=${SWIFT_ROOT}/usr/bin/swift" >> $GITHUB_OUTPUT
 
           ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
@@ -85,7 +86,7 @@ jobs:
       - name: Install SDK
         run: |
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
-          ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android
+          ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android28
       - name: Build swift-algorithms
         run: |
           cd ${{ runner.temp }}

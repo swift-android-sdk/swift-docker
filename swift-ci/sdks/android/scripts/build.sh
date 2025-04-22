@@ -474,6 +474,7 @@ done
 
 rm -r ${sysroot_path}/usr/share/{doc,man}
 rm -r ${sysroot_path}/usr/{include,lib}/{i686,riscv64}-linux-android
+rm -r ${sysroot_path}/usr/lib/swift/clang/lib/linux/*{i[36]86,riscv64}*
 rm -r ${sdk_staging}
 
 # validate that some expected paths exist
