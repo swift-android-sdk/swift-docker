@@ -74,7 +74,7 @@ if [[ ! -d ${PATCHDIR} ]]; then
         git apply -v $PATCHDIR/swift-android.patch
         # swift-android-ci.patch is not needed, since it is only used for llbuild, etc.
         #git apply -C1 $PATCHDIR/swift-android-ci.patch
-        git apply -v $PATCHDIR/swift-android-ci-release.patch
+        #git apply -v $PATCHDIR/swift-android-ci-release.patch
         git apply -v $PATCHDIR/swift-android-testing-release.patch
 
         perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
