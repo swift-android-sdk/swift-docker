@@ -87,6 +87,9 @@ jobs:
         run: |
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
           ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android28
+          # recent releases require that ANDROID_NDK_ROOT *not* be set
+          # see https://github.com/finagolfin/swift-android-sdk/issues/207
+          echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
       - name: Build swift-algorithms
         run: |
           cd ${{ runner.temp }}
