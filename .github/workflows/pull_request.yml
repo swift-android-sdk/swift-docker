@@ -39,8 +39,9 @@ jobs:
      strategy:
        fail-fast: false
        matrix:
-         arch: ['x86_64', '']
-     #name: Build Android SDK
+         # build only x86_64 to speed up the validation
+         arch: ['x86_64']
+         #arch: ['x86_64', '']
      runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
