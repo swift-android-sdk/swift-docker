@@ -67,12 +67,21 @@ jobs:
           ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
 
+          ARTIFACT_EXT=".artifactbundle.tar.gz"
+          ARTIFACT_NAME=$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
           # artifacts need a unique name so we suffix with the matrix arch(s)
-          ARTIFACT_SUFFIX=""
           if [[ ! -z "${{ matrix.arch }}" ]]; then
-            ARTIFACT_SUFFIX="-${{ matrix.arch }}"
+            ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')"
           fi
-          echo "artifact-name=$(basename ${ARTIFACT_PATH} .tar.gz)${ARTIFACT_SUFFIX}.tar.gz" >> $GITHUB_OUTPUT
+          ARTIFACT_NAME="${ARTIFACT_NAME}${ARTIFACT_EXT}"
+
+          # There is no way to prevent even a single-file artifact from being zipped:
+          # https://github.com/actions/upload-artifact?tab=readme-ov-file#zip-archives
+          # so we tack ".zip" on to the end of the name
+          ARTIFACT_NAME="${ARTIFACT_NAME}.zip"
+
+          # e.g.: swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz
+          echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:
@@ -90,21 +99,7 @@ jobs:
           # recent releases require that ANDROID_NDK_ROOT *not* be set
           # see https://github.com/finagolfin/swift-android-sdk/issues/207
           echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
-      - name: Build swift-algorithms
-        run: |
-          cd ${{ runner.temp }}
-          git clone https://github.com/apple/swift-algorithms.git
-          cd swift-algorithms
-          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
-      - name: Test swift-algorithms on Android
-        uses: skiptools/swift-android-action@main
-        with:
-          #package-path: ${{ runner.temp }}/DemoProject
-          package-path: ${{ runner.temp }}/swift-algorithms
-          installed-sdk: x86_64-unknown-linux-android28
-          installed-swift: ${{ steps.paths.outputs.swift-root }}
       - name: Build Demo Project
-        if: false
         run: |
           cd ${{ runner.temp }}
           mkdir DemoProject
@@ -118,3 +113,16 @@ jobs:
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
           ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
+      - name: Build swift-algorithms
+        run: |
+          cd ${{ runner.temp }}
+          git clone https://github.com/apple/swift-algorithms.git
+          cd swift-algorithms
+          ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
+      - name: Test swift-algorithms on Android
+        uses: skiptools/swift-android-action@main
+        with:
+          #package-path: ${{ runner.temp }}/DemoProject
+          package-path: ${{ runner.temp }}/swift-algorithms
+          installed-sdk: x86_64-unknown-linux-android28
+          installed-swift: ${{ steps.paths.outputs.swift-root }}
