@@ -39,7 +39,7 @@ jobs:
      strategy:
        fail-fast: false
        matrix:
-         arch: ['x86_64', 'armv7,aarch64,x86_64']
+         arch: ['x86_64', '']
      #name: Build Android SDK
      runs-on: ubuntu-24.04
      steps:
@@ -62,8 +62,16 @@ jobs:
         run: |
           echo "swift-root=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)" >> $GITHUB_OUTPUT
           echo "swift-path=$(ls ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift)" >> $GITHUB_OUTPUT
-          echo "artifact-name=$(basename ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
-          echo "artifact-path=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)" >> $GITHUB_OUTPUT
+
+          ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
+          echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
+
+          # artifacts need a unique name so we suffix with the matrix arch(s)
+          ARTIFACT_SUFFIX=""
+          if [[ ! -z "${{ matrix.arch }}" ]]; then
+            ARTIFACT_SUFFIX="-${{ matrix.arch }}"
+          fi
+          echo "artifact-name=$(basename ${ARTIFACT_PATH} .tar.gz)${ARTIFACT_SUFFIX}.tar.gz" >> $GITHUB_OUTPUT
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:
