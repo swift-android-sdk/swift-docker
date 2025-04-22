@@ -70,26 +70,22 @@ pushd ${SDKROOT}/src/swift-project
     # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
     perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $PATCHDIR/swift-android.patch
 
-    # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
-    perl -pi -e 's/os\(Android\)/os\(AndroidDISABLED\)/g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
     # remove the need to link in android-execinfo
     perl -pi -e 's/dispatch android-execinfo/dispatch/g' $PATCHDIR/swift-android.patch
 
-    # fix for Process.swift:953:57: error: value of optional type 'posix_spawnattr_t?' (aka 'Optional<OpaquePointer>') must be unwrapped to a value of type 'posix_spawnattr_t' (aka 'OpaquePointer')
-    #perl -pi -e 's%canImport\(Darwin\) \|\| os\(Android\) \|\| os\(OpenBSD\)%canImport\(Darwin\) || os\(AndroidXXX\) || os\(OpenBSD\)%g' swift-corelibs-foundation/Sources/Foundation/Process.swift
-
     git apply -v $PATCHDIR/swift-android.patch
     # swift-android-ci.patch is not needed, since it is only used for llbuild, etc.
-    git apply -C1 $PATCHDIR/swift-android-ci.patch
-
-    # need to un-apply libandroid-spawn since we don't need it for API28+
-    perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
-    perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
-
+    #git apply -C1 $PATCHDIR/swift-android-ci.patch
     git apply -v $PATCHDIR/swift-android-ci-release.patch
     git apply -v $PATCHDIR/swift-android-testing-release.patch
 
     perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+    # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
+    perl -pi -e 's/os\(Android\)/os\(AndroidDISABLED\)/g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+
+    # need to un-apply libandroid-spawn since we don't need it for API28+
+    perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
+    perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
 popd
 
 ./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs ${TARGET_ARCHS}
