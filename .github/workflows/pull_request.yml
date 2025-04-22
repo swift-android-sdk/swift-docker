@@ -123,7 +123,8 @@ jobs:
           # recent releases require that ANDROID_NDK_ROOT *not* be set
           # see https://github.com/finagolfin/swift-android-sdk/issues/207
           echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
-      - name: Build Demo Project
+
+      - name: Create Demo Project
         run: |
           cd ${{ runner.temp }}
           mkdir DemoProject
@@ -136,28 +137,25 @@ jobs:
           echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
-          ${{ steps.info.outputs.swift-path }} build --build-tests --swift-sdk ${{ steps.info.outputs.sdk-id }}
       - name: Test Demo Project on Android
-        # only test for the complete arch SDK build to speed up CI
-        if: ${{ matrix.arch == '' }}
-        uses: skiptools/swift-android-action@main
+        uses: skiptools/swift-android-action@v2
         with:
+          # only test for the complete arch SDK build to speed up CI
+          run-tests: ${{ matrix.arch == '' }}
           package-path: ${{ runner.temp }}/DemoProject
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
-      - name: Build swift-algorithms
-        run: |
-          cd ${{ runner.temp }}
-          git clone https://github.com/apple/swift-algorithms.git
-          cd swift-algorithms
-          ${{ steps.info.outputs.swift-path }} build --build-tests --swift-sdk ${{ steps.info.outputs.sdk-id }}
-      - name: Test swift-algorithms on Android
-        # only test for the complete arch SDK build to speed up CI
-        if: ${{ matrix.arch == '' }}
-        uses: skiptools/swift-android-action@main
+
+      - name: Checkout swift-algorithms
+        uses: actions/checkout@v4
         with:
-          #package-path: ${{ runner.temp }}/DemoProject
-          package-path: ${{ runner.temp }}/swift-algorithms
+          repository: apple/swift-algorithms
+          path: swift-algorithms
+      - name: Test swift-algorithms
+        uses: skiptools/swift-android-action@v2
+        with:
+          run-tests: ${{ matrix.arch == '' }}
+          package-path: swift-algorithms
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
 

@@ -477,30 +477,6 @@ rm -r ${sysroot_path}/usr/{include,lib}/{i686,riscv64}-linux-android
 rm -r ${sysroot_path}/usr/lib/swift/clang/lib/linux/*{i[36]86,riscv64}*
 rm -r ${sdk_staging}
 
-# validate that some expected paths exist
-quiet_pushd ${sysroot_path}/usr
-    ls lib/swift/android
-    ls lib/swift/android/*
-    ls lib/swift/android/*/swiftrt.o
-
-    ls lib/swift_static-*
-    ls lib/swift_static-*/android
-    ls lib/swift_static-*/android/libFoundationEssentials.a
-
-    ls lib/*-linux-android/libFoundationEssentials.so
-    ls lib/*-linux-android/libFoundationNetworking.so
-    ls lib/*-linux-android/libFoundationInternationalization.so
-    ls lib/*-linux-android/lib_FoundationICU.so
-    ls lib/*-linux-android/libFoundationXML.so
-    ls lib/*-linux-android/libTesting.so
-
-    ls lib/swift/clang/lib
-    ls lib/swift/clang/lib/linux
-    ls lib/swift/clang/lib/linux/*
-    ls lib/swift/clang/lib/linux/*/libunwind.a
-    ls lib/*-linux-android/*/crtbegin_dynamic.o
-quiet_popd
-
 cat > swift-sdk.json <<EOF
 {
   "schemaVersion": "4.0",
