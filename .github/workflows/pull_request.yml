@@ -46,17 +46,12 @@ jobs:
      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: |
+          sudo apt install -q ninja-build patchelf
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |
-          sudo apt install -q ninja-build patchelf
-          # build all architectures
-          #./build
-
-          # just build x86_64 for testing
-          #TARGET_ARCHS=x86_64 ./build
-
-          # build arch specified by the matrix
           TARGET_ARCHS=${{ matrix.arch }} ./build
       - name: Get artifact info
         id: paths
@@ -69,7 +64,7 @@ jobs:
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
 
           ARTIFACT_EXT=".artifactbundle.tar.gz"
-          ARTIFACT_NAME=$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
+          ARTIFACT_NAME="$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
           # artifacts need a unique name so we suffix with the matrix arch(s)
           if [[ ! -z "${{ matrix.arch }}" ]]; then
             ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')"
@@ -93,13 +88,39 @@ jobs:
         run: |
           # need to free up some space or else when installing we get: No space left on device
           rm -rf ${{ runner.temp }}/swift-android-sdk/{build,src}
-      - name: Install SDK
+      - name: Install artifactbundle
+        shell: bash
         run: |
+          set -ex
           ${{ steps.paths.outputs.swift-path }} sdk install ${{ steps.paths.outputs.artifact-path }}
           ${{ steps.paths.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.paths.outputs.swift-path }} sdk list | head -n 1) x86_64-unknown-linux-android28
           # recent releases require that ANDROID_NDK_ROOT *not* be set
           # see https://github.com/finagolfin/swift-android-sdk/issues/207
           echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
+
+          # validate some required paths in the artifactbundle
+          cd ${HOME}/.config/swiftpm/swift-sdks/*.artifactbundle/*/*/usr
+          pwd
+
+          ls lib/swift/android
+          ls lib/swift/android/*
+          ls lib/swift/android/*/swiftrt.o
+          ls lib/*-linux-android/*/crtbegin_dynamic.o
+
+          ls lib/swift_static-*
+          ls lib/swift_static-*/android
+          ls lib/swift_static-*/android/libFoundationEssentials.a
+
+          ls lib/*-linux-android/libFoundationEssentials.so
+          ls lib/*-linux-android/libFoundationNetworking.so
+          ls lib/*-linux-android/libFoundationInternationalization.so
+          ls lib/*-linux-android/lib_FoundationICU.so
+          ls lib/*-linux-android/libFoundationXML.so
+          ls lib/*-linux-android/libTesting.so
+
+          ls lib/swift/clang/lib
+          ls lib/swift/clang/lib/linux
+          ls lib/swift/clang/lib/linux/*/libunwind.a
       - name: Build Demo Project
         run: |
           cd ${{ runner.temp }}
@@ -114,6 +135,12 @@ jobs:
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
           ${{ steps.paths.outputs.swift-path }} build --build-tests --swift-sdk x86_64-unknown-linux-android28
+      - name: Test Demo Project on Android
+        uses: skiptools/swift-android-action@main
+        with:
+          package-path: ${{ runner.temp }}/DemoProject
+          installed-sdk: x86_64-unknown-linux-android28
+          installed-swift: ${{ steps.paths.outputs.swift-root }}
       - name: Build swift-algorithms
         run: |
           cd ${{ runner.temp }}

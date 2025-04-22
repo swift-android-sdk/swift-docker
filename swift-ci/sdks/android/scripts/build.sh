@@ -487,6 +487,13 @@ quiet_pushd ${sysroot_path}/usr
     ls lib/swift_static-*/android
     ls lib/swift_static-*/android/libFoundationEssentials.a
 
+    ls lib/*-linux-android/libFoundationEssentials.so
+    ls lib/*-linux-android/libFoundationNetworking.so
+    ls lib/*-linux-android/libFoundationInternationalization.so
+    ls lib/*-linux-android/lib_FoundationICU.so
+    ls lib/*-linux-android/libFoundationXML.so
+    ls lib/*-linux-android/libTesting.so
+
     ls lib/swift/clang/lib
     ls lib/swift/clang/lib/linux
     ls lib/swift/clang/lib/linux/*
@@ -545,10 +552,9 @@ if [[ -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
 
     quiet_pushd "${build_dir}"
         mkdir -p "${products_dir}"
-        tar cvzf "${products_dir}/${bundle}.tar.gz" "${bundle}"
+        tar czf "${products_dir}/${bundle}.tar.gz" "${bundle}"
     quiet_popd
 fi
 
 groupend
-
 
