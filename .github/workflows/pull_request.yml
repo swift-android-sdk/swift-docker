@@ -8,6 +8,8 @@ env:
 jobs:
    build:
      name: Build Docker images
+     # disabled for CI testing
+     if: false
      runs-on: ubuntu-latest
      steps:
       - name: Checkout repository
@@ -24,6 +26,8 @@ jobs:
 
    static-linux-build:
      name: Build Static Linux image
+     # disabled for CI testing
+     if: false
      runs-on: ubuntu-latest
      steps:
       - name: Checkout repository
@@ -33,7 +37,7 @@ jobs:
         run: ./build
 
    android-build:
-     name: Build Android ${{ matrix.arch }} SDK
+     name: Build Android ${{ matrix.swift-version }} ${{ matrix.arch }} SDK
      strategy:
        fail-fast: false
        matrix:
