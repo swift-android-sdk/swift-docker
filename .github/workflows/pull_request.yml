@@ -40,9 +40,10 @@ jobs:
          # blank arch builds all (aarch64,x86_64,armv7)
          #arch: ['']
          # builds only x86_64 to speed up the validation
-         #arch: ['x86_64']
+         arch: ['x86_64']
          # build both the quick (x86_64) and complete (aarch64,x86_64,armv7) SDKs
-         arch: ['x86_64', '']
+         #arch: ['x86_64', '']
+         swift-version: ['release', 'devel', 'trunk']
      runs-on: ubuntu-24.04
      steps:
       - name: Checkout repository
@@ -53,7 +54,7 @@ jobs:
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |
-          TARGET_ARCHS=${{ matrix.arch }} ./build
+          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build
       - name: Get artifact info
         id: info
         shell: bash
