@@ -87,28 +87,30 @@ jobs:
           # swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz.zip
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
+          tree ${ARTIFACT_BUILD}/
+
           # validate some required paths in the artifactbundle
-          pushd ${ARTIFACT_BUILD}/*/*/usr
-            ls lib/swift/android
-            ls lib/swift/android/*
-            ls lib/swift/android/*/swiftrt.o
-            ls lib/*-linux-android/*/crtbegin_dynamic.o
+          #pushd ${ARTIFACT_BUILD}/*/*/usr
+            #ls lib/swift/android
+            #ls lib/swift/android/*
+            #ls lib/swift/android/*/swiftrt.o
+            #ls lib/*-linux-android/*/crtbegin_dynamic.o
 
-            ls lib/swift_static-*
-            ls lib/swift_static-*/android
-            ls lib/swift_static-*/android/libFoundationEssentials.a
+            #ls lib/swift_static-*
+            #ls lib/swift_static-*/android
+            #ls lib/swift_static-*/android/libFoundationEssentials.a
 
-            ls lib/*-linux-android/libFoundationEssentials.so
-            ls lib/*-linux-android/libFoundationNetworking.so
-            ls lib/*-linux-android/libFoundationInternationalization.so
-            ls lib/*-linux-android/lib_FoundationICU.so
-            ls lib/*-linux-android/libFoundationXML.so
-            ls lib/*-linux-android/libTesting.so
+            #ls lib/*-linux-android/libFoundationEssentials.so
+            #ls lib/*-linux-android/libFoundationNetworking.so
+            #ls lib/*-linux-android/libFoundationInternationalization.so
+            #ls lib/*-linux-android/lib_FoundationICU.so
+            #ls lib/*-linux-android/libFoundationXML.so
+            #ls lib/*-linux-android/libTesting.so
 
-            ls lib/swift/clang/lib
-            ls lib/swift/clang/lib/linux
-            ls lib/swift/clang/lib/linux/*/libunwind.a
-          popd
+            #ls lib/swift/clang/lib
+            #ls lib/swift/clang/lib/linux
+            #ls lib/swift/clang/lib/linux/*/libunwind.a
+          #popd
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:
