@@ -50,6 +50,24 @@ jobs:
          swift-version: ['release', 'devel', 'trunk']
      runs-on: ubuntu-24.04
      steps:
+  free-disk-space:
+    runs-on: ubuntu-latest
+    steps:
+      # need to free up some space or we can run out when building
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Install Dependencies
@@ -122,7 +140,9 @@ jobs:
       - name: Cleanup
         run: |
           # need to free up some space or else when installing we get: No space left on device
+          df -h
           rm -rf ${{ runner.temp }}/swift-android-sdk/{build,src}
+          df -h
       - name: Install artifactbundle
         shell: bash
         run: |
