@@ -462,6 +462,7 @@ EOF
 mkdir -p $swift_res_root/usr/lib/swift/clang/lib
 cp -r $host_toolchain/lib/clang/*/include $swift_res_root/usr/lib/swift/clang
 
+
 for arch in $archs; do
     quiet_pushd ${sdk_staging}/${arch}/usr
         rm -r bin
@@ -503,12 +504,8 @@ if [ "${NDK_LOCATION}" = "external" ]; then
     # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
     if [ "true" = "true" ]; then
         SWIFTRT=android/x86_64/swiftrt.o
-
         mkdir -p ${ndk_sysroot}/usr/lib/swift/android/x86_64
         ln -srv ${swift_res_root}/usr/lib/swift-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift/${SWIFTRT}
-
-        mkdir -p ${ndk_sysroot}/usr/lib/swift_static/android/x86_64
-        #ln -srv ${swift_res_root}/usr/lib/swift_static-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift_static/${SWIFTRT}
     else
         # try brute copying swiftrt.o to EVERY directory to see if it gets picked up somehow
         echo "Seeking workaround for swiftrt.o needing to be under sdkRoot"
