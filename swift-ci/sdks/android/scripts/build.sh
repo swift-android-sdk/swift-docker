@@ -218,7 +218,6 @@ HOST=linux-x86_64
 #HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 ndk_installation=$ndk_home/toolchains/llvm/prebuilt/$HOST
 
-
 echo "Swift found at ${swift_dir}"
 echo "Host toolchain found at ${host_toolchain}"
 ${host_toolchain}/bin/swift --version
