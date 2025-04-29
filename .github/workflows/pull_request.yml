@@ -145,10 +145,10 @@ jobs:
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
       - name: Test Demo Project on Android
-        uses: skiptools/swift-android-action@v2
+        uses: skiptools/swift-android-action@main
         with:
           # only test for the complete arch SDK build to speed up CI
-          run-tests: ${{ matrix.arch == '' }}
+          #run-tests: ${{ matrix.arch == '' }}
           package-path: ${{ runner.temp }}/DemoProject
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
@@ -159,7 +159,7 @@ jobs:
           repository: apple/swift-algorithms
           path: swift-algorithms
       - name: Test swift-algorithms
-        uses: skiptools/swift-android-action@v2
+        uses: skiptools/swift-android-action@main
         with:
           run-tests: ${{ matrix.arch == '' }}
           package-path: swift-algorithms

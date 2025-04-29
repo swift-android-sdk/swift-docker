@@ -500,14 +500,20 @@ if [ "${NDK_LOCATION}" = "external" ]; then
     # need to manually copy over swiftrt.o or else:
     # error: link command failed with exit code 1 (use -v to see invocation)
     # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a_android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
-    SWIFTRT=${swift_res_root}/usr/lib/swift-x86_64/android/x86_64/swiftrt.o
-
     # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
-    mkdir -p ${ndk_sysroot}/usr/lib/swift/android/x86_64
-    cp -v ${SWIFTRT} ${ndk_sysroot}/usr/lib/swift/android/x86_64/swiftrt.o
+    if [ "true" = "true" ]; then
+        SWIFTRT=android/x86_64/swiftrt.o
 
-    mkdir -p ${ndk_sysroot}/usr/lib/swift_static/android/x86_64
-    cp -v ${SWIFTRT} ${ndk_sysroot}/usr/lib/swift_static/android/x86_64/swiftrt.o
+        mkdir -p ${ndk_sysroot}/usr/lib/swift/android/x86_64
+        ln -srv ${swift_res_root}/usr/lib/swift-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift/${SWIFTRT}
+
+        mkdir -p ${ndk_sysroot}/usr/lib/swift_static/android/x86_64
+        #ln -srv ${swift_res_root}/usr/lib/swift_static-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift_static/${SWIFTRT}
+    else
+        # try brute copying swiftrt.o to EVERY directory to see if it gets picked up somehow
+        echo "Seeking workaround for swiftrt.o needing to be under sdkRoot"
+        #find ${swift_res_root} -type d -exec cp -av ${SWIFTRT} {} \;
+    fi
 else
     rm -r ${swift_res_root}/usr/{include,lib}/{i686,riscv64}-linux-android
     rm -r ${swift_res_root}/usr/lib/swift/clang/lib/linux/*{i[36]86,riscv64}*
@@ -542,14 +548,17 @@ EOF
         else
             SWIFT_RES_DIR="swift"
         fi
+        SWIFT_STATIC_RES_DIR="swift_static-${arch}"
 
         cat >> swift-sdk.json <<EOF
     "${arch}-unknown-linux-android${api}": {
       "sdkRootPath": "${ndk_sysroot}",
       "swiftResourcesPath": "${swift_res_root}/usr/lib/${SWIFT_RES_DIR}",
-      "swiftStaticResourcesPath": "${swift_res_root}/usr/lib/swift_static-${arch}",
+      "swiftStaticResourcesPath": "${swift_res_root}/usr/lib/${SWIFT_STATIC_RES_DIR}",
       "toolsetPaths": [ "swift-toolset.json" ]
 EOF
+      #"librarySearchPaths": [ "${swift_res_root}/usr/lib/swift-x86_64/android/x86_64" ],
+      #"includeSearchPaths": [ "${ndk_sysroot}/usr/include" ],
     done
 done
 
