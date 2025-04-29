@@ -192,7 +192,7 @@ if [[ $swift_version == swift-* ]]; then
 fi
 
 if [[ -z "$sdk_name" ]]; then
-    sdk_name=swift-${swift_version}_android-${android_sdk_version}
+    sdk_name=swift-${swift_version}-android-${android_sdk_version}
 fi
 
 libxml2_version=$(versionFromTag ${source_dir}/libxml2)
@@ -500,9 +500,9 @@ done
 if [ "${NDK_LOCATION}" = "external" ]; then
     # need to manually copy over swiftrt.o or else:
     # error: link command failed with exit code 1 (use -v to see invocation)
-    # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a_android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
+    # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a-android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
     # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
-    if [ "true" = "true" ]; then
+    if [ "${NDK_LOCATION}" = "external" ]; then
         SWIFTRT=android/x86_64/swiftrt.o
         mkdir -p ${ndk_sysroot}/usr/lib/swift/android/x86_64
         ln -srv ${swift_res_root}/usr/lib/swift-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift/${SWIFTRT}
