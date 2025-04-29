@@ -87,7 +87,9 @@ jobs:
           # swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz.zip
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
-          tree ${ARTIFACT_BUILD}/
+          #tree ${ARTIFACT_BUILD}/
+          # show an abridged tree
+          tree ${ARTIFACT_BUILD} --filesfirst --prune -P 'Android.swiftmodule' -P 'libswiftAndroid.*' -P 'libFoundation.*' -P 'swiftrt.o' -P 'swift*.json' -P 'info.json' -P 'api-level.h' -P 'android.modulemap' -P 'SwiftAndroidNDK.h' -P 'bridging.modulemap'
 
           # validate some required paths in the artifactbundle
           #pushd ${ARTIFACT_BUILD}/*/*/usr
