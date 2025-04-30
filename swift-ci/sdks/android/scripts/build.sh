@@ -432,15 +432,10 @@ cp -a ${build_dir}/sdk_root ${sdk_staging}
 
 if [ "${NDK_LOCATION}" = "external" ]; then
     swift_res_root="swift-resources"
-    #ndk_sysroot=${ndk_installation}/sysroot
-    #ndk_sysroot=NONE
     ndk_sysroot="ndk-sysroot"
     cp -a ${ndk_installation}/sysroot ${ndk_sysroot}
 else
-    #sysroot_path="ndk-sysroot"
-    #sysroot_path="android-27c-sysroot"
     merged_sysroot_path="sysroot"
-
     swift_res_root=${merged_sysroot_path}
     ndk_sysroot=${merged_sysroot_path}
     cp -a ${ndk_installation}/sysroot ${ndk_sysroot}
@@ -507,16 +502,10 @@ if [ "${NDK_LOCATION}" = "external" ]; then
     # error: link command failed with exit code 1 (use -v to see invocation)
     # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a-android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
     # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
-    if [ "${NDK_LOCATION}" = "external" ]; then
-        for arch in $archs; do
-            mkdir -p ${ndk_sysroot}/usr/lib/swift/android/${arch}
-            ln -srv ${swift_res_root}/usr/lib/swift-${arch}/android/${arch}/swiftrt.o ${ndk_sysroot}/usr/lib/swift/android/${arch}/swiftrt.o
-        done
-    else
-        # try brute copying swiftrt.o to EVERY directory to see if it gets picked up somehow
-        echo "Seeking workaround for swiftrt.o needing to be under sdkRoot"
-        #find ${swift_res_root} -type d -exec cp -av ${SWIFTRT} {} \;
-    fi
+    for arch in $archs; do
+        mkdir -p ${ndk_sysroot}/usr/lib/swift/android/${arch}
+        ln -srv ${swift_res_root}/usr/lib/swift-${arch}/android/${arch}/swiftrt.o ${ndk_sysroot}/usr/lib/swift/android/${arch}/swiftrt.o
+    done
 else
     rm -r ${swift_res_root}/usr/{include,lib}/{i686,riscv64}-linux-android
     rm -r ${swift_res_root}/usr/lib/swift/clang/lib/linux/*{i[36]86,riscv64}*
