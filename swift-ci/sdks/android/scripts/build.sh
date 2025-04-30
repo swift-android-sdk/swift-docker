@@ -218,7 +218,6 @@ HOST=linux-x86_64
 #HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 ndk_installation=$ndk_home/toolchains/llvm/prebuilt/$HOST
 
-
 echo "Swift found at ${swift_dir}"
 echo "Host toolchain found at ${host_toolchain}"
 ${host_toolchain}/bin/swift --version
@@ -503,9 +502,10 @@ if [ "${NDK_LOCATION}" = "external" ]; then
     # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a-android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
     # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
     if [ "${NDK_LOCATION}" = "external" ]; then
-        SWIFTRT=android/x86_64/swiftrt.o
-        mkdir -p ${ndk_sysroot}/usr/lib/swift/android/x86_64
-        ln -srv ${swift_res_root}/usr/lib/swift-x86_64/${SWIFTRT} ${ndk_sysroot}/usr/lib/swift/${SWIFTRT}
+        for arch in $archs; do
+            mkdir -p ${ndk_sysroot}/usr/lib/swift/android/${arch}
+            ln -srv ${swift_res_root}/usr/lib/swift-${arch}/android/${arch}/swiftrt.o ${ndk_sysroot}/usr/lib/swift/android/${arch}/swiftrt.o
+        done
     else
         # try brute copying swiftrt.o to EVERY directory to see if it gets picked up somehow
         echo "Seeking workaround for swiftrt.o needing to be under sdkRoot"
