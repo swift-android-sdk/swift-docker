@@ -51,11 +51,12 @@ jobs:
      runs-on: ubuntu-24.04
      steps:
       - name: Free Disk Space
-        if: false
         run: |
           df -h
           # brings available space from 25G to 42G
-          sudo rm -rf /usr/share/miniconda /usr/share/az* /usr/share/glade* /usr/local/lib/node_modules /usr/local/share/chromium /usr/local/share/powershell /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          #sudo rm -rf /usr/share/miniconda /usr/share/az* /usr/share/glade* /usr/local/lib/node_modules /usr/local/share/chromium /usr/local/share/powershell /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/miniconda /usr/share/az* /usr/share/glade* /usr/local/share/chromium /usr/local/share/powershell /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h
           sudo docker image prune --all --force
           sudo docker builder prune -a
           df -h
