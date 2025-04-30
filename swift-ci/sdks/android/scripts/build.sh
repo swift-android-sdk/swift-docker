@@ -487,9 +487,15 @@ for arch in $archs; do
         mv lib/swift_static lib/swift_static-$arch
         mv lib/lib*.a lib/swift_static-$arch/android
 
-        mkdir -p lib/swift/clang/lib
-        cp -a ${ndk_installation}/lib/clang/*/lib/linux lib/swift/clang/lib
-        ln -s ../swift/clang lib/swift_static-$arch/clang
+        ln -sv ../swift/clang lib/swift_static-$arch/clang
+
+        # copy the clang libraries that we need to build for each architecture
+        aarch=${arch/armv7/arm}
+        mkdir -p lib/swift/clang/lib/linux/${aarch}
+
+        # match clang version 21, 22, etc.
+        cp -av ${ndk_installation}/lib/clang/[0-9]*/lib/linux/libclang_rt.builtins-${aarch}-android.a lib/swift/clang/lib/linux/
+        cp -av ${ndk_installation}/lib/clang/[0-9]*/lib/linux/${aarch}/libunwind.a lib/swift/clang/lib/linux/${aarch}/
     quiet_popd
 
     # now sync the massaged sdk_root into the swift_res_root
