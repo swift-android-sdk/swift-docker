@@ -504,8 +504,8 @@ DESTINATION=$(dirname $(dirname $(realpath $0)))/ndk-sysroot
 rm -rf ${DESTINATION}
 
 # copy vs. link the NDK files
-ANDROID_NDK_LINK=${ANDROID_NDK_LINK:-1}
-if [[ "${ANDROID_NDK_LINK}" != 1 ]]; then
+SWIFT_ANDROID_NDK_LINK=${SWIFT_ANDROID_NDK_LINK:-1}
+if [[ "${SWIFT_ANDROID_NDK_LINK}" != 1 ]]; then
     ANDROID_NDK_DESC="copied"
     cp -a ${PREBUILT}/*/sysroot ${DESTINATION}
 else
@@ -518,9 +518,13 @@ else
     done
 fi
 
-# copy each architecture's swiftrt.o into the sysroot
-mkdir -p ${DESTINATION}/usr/lib/swift/android
-cp -a ${DESTINATION}/../swift-resources/usr/lib/swift-*/android/* ${DESTINATION}/usr/lib/swift/android/
+# copy each architecture's swiftrt.o into the sysroot,
+# working around https://github.com/swiftlang/swift/pull/79621
+for swiftrt in ${DESTINATION}/../swift-resources/usr/lib/swift-*/android/*/swiftrt.o; do
+    arch=$(basename $(dirname ${swiftrt}))
+    mkdir -p ${DESTINATION}/usr/lib/swift/android/${arch}
+    cp -a ${swiftrt} ${DESTINATION}/usr/lib/swift/android/${arch}
+done
 
 echo "$(basename $0): success: ndk-sysroot ${ANDROID_NDK_DESC} to Android SDK"
 EOF
