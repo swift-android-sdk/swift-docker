@@ -488,6 +488,8 @@ if [[ ${INCLUDE_NDK_SYSROOT} != 1 ]]; then
     mkdir scripts/
     cat > scripts/setup-android-sdk.sh <<'EOF'
 #/bin/sh
+# this script will setup the ndk-sysroot with links to the
+# local installation indicated by ANDROID_NDK_HOME
 set -e
 if [ -z "${ANDROID_NDK_HOME}" ]; then
     echo "$(basename $0): error: missing environment variable ANDROID_NDK_HOME"
@@ -501,14 +503,27 @@ fi
 DESTINATION=$(dirname $(dirname $(realpath $0)))/ndk-sysroot
 # clear out any previous NDK setup
 rm -rf ${DESTINATION}
-cp -a ${PREBUILT}/*/sysroot ${DESTINATION}
 
-mkdir -p ${DESTINATION}/usr/lib/swift/android
+# copy vs. link the NDK files
+ANDROID_NDK_LINK=${ANDROID_NDK_LINK:-1}
+if [[ "${ANDROID_NDK_LINK}" != 1 ]]; then
+    ANDROID_NDK_DESC="copied"
+    cp -a ${PREBUILT}/*/sysroot ${DESTINATION}
+else
+    ANDROID_NDK_DESC="linked"
+    mkdir -p ${DESTINATION}/usr/lib
+    ln -s $(realpath ${PREBUILT}/*/sysroot/usr/include) ${DESTINATION}/usr/include
+    for triplePath in ${PREBUILT}/*/sysroot/usr/lib/*; do
+        triple=$(basename ${triplePath})
+        ln -s $(realpath ${triplePath}) ${DESTINATION}/usr/lib/${triple}
+    done
+fi
 
 # copy each architecture's swiftrt.o into the sysroot
+mkdir -p ${DESTINATION}/usr/lib/swift/android
 cp -a ${DESTINATION}/../swift-resources/usr/lib/swift-*/android/* ${DESTINATION}/usr/lib/swift/android/
 
-echo "$(basename $0): success: ndk-sysroot copied to Android SDK"
+echo "$(basename $0): success: ndk-sysroot ${ANDROID_NDK_DESC} to Android SDK"
 EOF
     chmod +x scripts/setup-android-sdk.sh
 else
