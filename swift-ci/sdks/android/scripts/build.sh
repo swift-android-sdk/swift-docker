@@ -525,6 +525,11 @@ for swiftrt in ${DESTINATION}/../swift-resources/usr/lib/swift-*/android/*/swift
     mkdir -p ${DESTINATION}/usr/lib/swift/android/${arch}
     cp -a ${swiftrt} ${DESTINATION}/usr/lib/swift/android/${arch}
 done
+for swiftrt in ${DESTINATION}/../swift-resources/usr/lib/swift_static-*/android/*/swiftrt.o; do
+    arch=$(basename $(dirname ${swiftrt}))
+    mkdir -p ${DESTINATION}/usr/lib/swift_static/android/${arch}
+    cp -a ${swiftrt} ${DESTINATION}/usr/lib/swift_static/android/${arch}
+done
 
 echo "$(basename $0): success: ndk-sysroot ${ANDROID_NDK_DESC} to Android SDK"
 EOF
