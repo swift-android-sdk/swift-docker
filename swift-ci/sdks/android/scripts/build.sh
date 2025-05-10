@@ -326,8 +326,9 @@ for arch in $archs; do
             -DOPENSSL_INCLUDE_DIR=$sdk_root/usr/include \
             -DOPENSSL_SSL_LIBRARY=$sdk_root/usr/lib/libssl.a \
             -DOPENSSL_CRYPTO_LIBRARY=$sdk_root/usr/lib/libcrypto.a \
-            -DCURL_USE_OPENSSL=ON \
             -DCURLSSLOPT_NATIVE_CA=ON \
+            -DCURL_USE_OPENSSL=ON \
+            -DCURL_USE_LIBSSH2=OFF \
             -DTHREADS_PREFER_PTHREAD_FLAG=OFF \
             -DCMAKE_THREAD_PREFER_PTHREAD=OFF \
             -DCMAKE_THREADS_PREFER_PTHREAD_FLAG=OFF \
@@ -486,7 +487,7 @@ if [[ ${INCLUDE_NDK_SYSROOT} != 1 ]]; then
     #ANDROID_NDK_HOME="/opt/homebrew/share/android-ndk"
     mkdir scripts/
     cat > scripts/setup-android-sdk.sh <<'EOF'
-#/bin/sh
+#/bin/bash
 # this script will setup the ndk-sysroot with links to the
 # local installation indicated by ANDROID_NDK_HOME
 set -e
@@ -494,44 +495,61 @@ if [ -z "${ANDROID_NDK_HOME}" ]; then
     echo "$(basename $0): error: missing environment variable ANDROID_NDK_HOME"
     exit 1
 fi
-PREBUILT="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt"
-if [ ! -d "${PREBUILT}" ]; then
-    echo "$(basename $0): error: ANDROID_NDK_HOME not found: ${PREBUILT}"
+ndk_prebuilt="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt"
+if [ ! -d "${ndk_prebuilt}" ]; then
+    echo "$(basename $0): error: ANDROID_NDK_HOME not found: ${ndk_prebuilt}"
     exit 1
 fi
-DESTINATION=$(dirname $(dirname $(realpath $0)))/ndk-sysroot
-# clear out any previous NDK setup
-rm -rf ${DESTINATION}
 
-# copy vs. link the NDK files
+#Pkg.Revision = 27.0.12077973
+#Pkg.Revision = 28.1.13356709
+ndk_version=$(grep '^Pkg.Revision = ' "${ANDROID_NDK_HOME}/source.properties" | cut -f3- -d' ' | cut -f 1 -d '.')
+if [[ "${ndk_version}" -lt 27 ]]; then
+    echo "$(basename $0): error: minimum NDK version 27 required; found ${ndk_version} in ${ANDROID_NDK_HOME}/source.properties"
+    exit 1
+fi
+
+cd $(dirname $(dirname $(realpath $0)))
+swift_resources=swift-resources
+ndk_sysroot=ndk-sysroot
+
+if [[ -d "${ndk_sysroot}" ]]; then
+    # clear out any previous NDK setup
+    rm -rf ${ndk_sysroot}
+    ndk_re="re-"
+fi
+
+
+# link vs. copy the NDK files
 SWIFT_ANDROID_NDK_LINK=${SWIFT_ANDROID_NDK_LINK:-1}
-if [[ "${SWIFT_ANDROID_NDK_LINK}" != 1 ]]; then
-    ANDROID_NDK_DESC="copied"
-    cp -a ${PREBUILT}/*/sysroot ${DESTINATION}
-else
-    ANDROID_NDK_DESC="linked"
-    mkdir -p ${DESTINATION}/usr/lib
-    ln -s $(realpath ${PREBUILT}/*/sysroot/usr/include) ${DESTINATION}/usr/include
-    for triplePath in ${PREBUILT}/*/sysroot/usr/lib/*; do
+if [[ "${SWIFT_ANDROID_NDK_LINK}" == 1 ]]; then
+    ndk_action="${ndk_re}linked"
+    mkdir -p ${ndk_sysroot}/usr/lib
+    ln -s ${ndk_prebuilt}/*/sysroot/usr/include ${ndk_sysroot}/usr/include
+    for triplePath in ${ndk_prebuilt}/*/sysroot/usr/lib/*; do
         triple=$(basename ${triplePath})
-        ln -s $(realpath ${triplePath}) ${DESTINATION}/usr/lib/${triple}
+        ln -s ${triplePath} ${ndk_sysroot}/usr/lib/${triple}
     done
+else
+    ndk_action="${ndk_re}copied"
+    cp -a ${ndk_prebuilt}/*/sysroot ${ndk_sysroot}
 fi
 
 # copy each architecture's swiftrt.o into the sysroot,
 # working around https://github.com/swiftlang/swift/pull/79621
-for swiftrt in ${DESTINATION}/../swift-resources/usr/lib/swift-*/android/*/swiftrt.o; do
-    arch=$(basename $(dirname ${swiftrt}))
-    mkdir -p ${DESTINATION}/usr/lib/swift/android/${arch}
-    cp -a ${swiftrt} ${DESTINATION}/usr/lib/swift/android/${arch}
-done
-for swiftrt in ${DESTINATION}/../swift-resources/usr/lib/swift_static-*/android/*/swiftrt.o; do
-    arch=$(basename $(dirname ${swiftrt}))
-    mkdir -p ${DESTINATION}/usr/lib/swift_static/android/${arch}
-    cp -a ${swiftrt} ${DESTINATION}/usr/lib/swift_static/android/${arch}
+for folder in swift swift_static; do
+    for swiftrt in ${swift_resources}/usr/lib/${folder}-*/android/*/swiftrt.o; do
+        arch=$(basename $(dirname ${swiftrt}))
+        mkdir -p ${ndk_sysroot}/usr/lib/${folder}/android/${arch}
+        if [[ "${SWIFT_ANDROID_NDK_LINK}" == 1 ]]; then
+            ln -s ../../../../../../${swiftrt} ${ndk_sysroot}/usr/lib/${folder}/android/${arch}/
+        else
+            cp -a ${swiftrt} ${ndk_sysroot}/usr/lib/${folder}/android/${arch}/
+        fi
+    done
 done
 
-echo "$(basename $0): success: ndk-sysroot ${ANDROID_NDK_DESC} to Android SDK"
+echo "$(basename $0): success: ndk-sysroot ${ndk_action} to Android NDK at ${ndk_prebuilt}"
 EOF
     chmod +x scripts/setup-android-sdk.sh
 else
