@@ -64,23 +64,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: 'true'
-      - name: "Check Patches"
-        working-directory: swift-ci/sdks/android
-        run: ls resources/patches/
-      - name: Install Dependencies
-        if: ${{ matrix.build-type == 'local' }}
-        run: |
-          sudo apt install -q ninja-build patchelf
       - name: Build Android SDK (Local)
         if: ${{ matrix.build-type == 'local' }}
         working-directory: swift-ci/sdks/android
         run: |
+          sudo apt install -q ninja-build patchelf
           BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-local
       - name: Build Android SDK (Docker)
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
-          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build
+          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-docker
       - name: Get artifact info
         id: info
         shell: bash
