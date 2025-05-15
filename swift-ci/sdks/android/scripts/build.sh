@@ -109,7 +109,6 @@ declare_package libxml2 "libxml2" "MIT" \
 declare_package curl "curl" "MIT" "https://curl.se"
 declare_package boringssl "boringssl" "OpenSSL AND ISC AND MIT" \
                 "https://boringssl.googlesource.com/boringssl/"
-declare_package zlib "zlib" "Zlib" "https://zlib.net"
 
 # Parse command line arguments
 android_sdk_version=0.1
@@ -201,8 +200,6 @@ curl_version=${curl_desc#curl-}
 
 boringssl_version=$(describe ${source_dir}/boringssl)
 
-zlib_version=$(versionFromTag ${source_dir}/zlib)
-
 function quiet_pushd {
     pushd "$1" >/dev/null 2>&1
 }
@@ -232,7 +229,6 @@ echo "  - Swift ${swift_version}"
 echo "  - libxml2 ${libxml2_version}"
 echo "  - curl ${curl_version}"
 echo "  - BoringSSL ${boringssl_version}"
-echo "  - zlib ${zlib_version}"
 
 function run() {
     echo "$@"
@@ -241,7 +237,7 @@ function run() {
 
 header "Patching Sources"
 
-quiet_pushd ${source_dir}
+quiet_pushd ${source_dir}/swift-project
     patch="${patches_dir}/swift-android.patch"
 
     # patch the patch, which seems to only be needed for an API less than 28
@@ -251,9 +247,9 @@ quiet_pushd ${source_dir}
     # remove the need to link in android-execinfo
     perl -pi -e 's/dispatch android-execinfo/dispatch/g' $patch
 
-    if git apply --reverse --check "$patch" >/dev/null 2>&1; then
+    if git apply --reverse --check "$patch" ; then
         echo "already patched"
-    elif git apply "$patch" >/dev/null 2>&1; then
+    elif git apply "$patch" ; then
         echo "done"
     else
         echo "failed"
@@ -266,9 +262,9 @@ quiet_pushd ${source_dir}
         testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
     fi
 
-    if git apply --reverse --check "$testing_patch" >/dev/null 2>&1; then
+    if git apply --reverse --check "$testing_patch" ; then
         echo "already patched"
-    elif git apply "$testing_patch" >/dev/null 2>&1; then
+    elif git apply "$testing_patch" ; then
         echo "done"
     else
         echo "failed"
