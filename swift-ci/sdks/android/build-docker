@@ -33,7 +33,7 @@ ANDROID_NDK_VERSION=android-ndk-r27c
 $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
 echo "Testing docker container"
-$DOCKER run -it --rm \
+$DOCKER run --rm \
           -v ./source:/source \
           -v ./products:/products \
           swift-android \
@@ -46,7 +46,7 @@ scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
 mkdir -p products
 
 # Run the build
-$DOCKER run -it --rm \
+$DOCKER run --rm \
           -v ./source:/source \
           -v ./products:/products \
           swift-android \
