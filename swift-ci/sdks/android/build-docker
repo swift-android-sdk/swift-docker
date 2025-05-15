@@ -33,7 +33,9 @@ ANDROID_NDK_VERSION=android-ndk-r27c
 $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
 # Check-out the sources
-scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
+./scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
+
+./scripts/patch-sources.sh source
 
 mkdir -p products
 
