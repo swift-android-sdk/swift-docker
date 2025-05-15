@@ -238,23 +238,14 @@ function run() {
 header "Patching Sources"
 
 quiet_pushd ${source_dir}/swift-project
-    patch="${patches_dir}/swift-android.patch"
+    swift_android_patch="${patches_dir}/swift-android.patch"
 
     # patch the patch, which seems to only be needed for an API less than 28
     # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
-    perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $patch
+    perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $swift_android_patch
 
     # remove the need to link in android-execinfo
-    perl -pi -e 's/dispatch android-execinfo/dispatch/g' $patch
-
-    if git apply --reverse --check "$patch" ; then
-        echo "already patched"
-    elif git apply "$patch" ; then
-        echo "done"
-    else
-        echo "failed"
-        exit 1
-    fi
+    perl -pi -e 's/dispatch android-execinfo/dispatch/g' $swift_android_patch
 
     if [ "${BUILD_VERSION}" = 'release' ]; then
         testing_patch="${patches_dir}/swift-android-testing-release.patch"
@@ -262,14 +253,21 @@ quiet_pushd ${source_dir}/swift-project
         testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
     fi
 
-    if git apply --reverse --check "$testing_patch" ; then
-        echo "already patched"
-    elif git apply "$testing_patch" ; then
-        echo "done"
-    else
-        echo "failed"
-        exit 1
-    fi
+    for patch in "$swift_android_patch" "$testing_patch"; do
+        echo "applying patch $patch in $PWD…"
+
+        if git apply --reverse --check "$patch" >/dev/null 2>&1 ; then
+            echo "already patched"
+        elif git apply "$patch" ; then
+            echo "done"
+        else
+            echo "failed to apply patch $patch in $PWD"
+            # tolerate failed patches in trunk for now
+            if [[ "${BUILD_VERSION}" != 'trunk' ]]; then
+                exit 1
+            fi
+        fi
+    done
 
     perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
     # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
@@ -689,4 +687,3 @@ if [[ -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
 fi
 
 groupend
-

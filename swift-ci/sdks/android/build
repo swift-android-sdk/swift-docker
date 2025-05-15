@@ -25,25 +25,34 @@ esac
 
 case "${BUILD_VERSION}" in
     release)
-        SWIFT_BRANCH="swift-6.1-branch"
+        LATEST_TOOLCHAIN_VERSION=$(curl -sL https://github.com/apple/swift/releases | grep -m1 swift-6.1 | cut -d- -f2)
+        SWIFT_TAG="swift-${LATEST_TOOLCHAIN_VERSION}-RELEASE"
+        SWIFT_BRANCH="swift-$(echo $SWIFT_TAG | cut -d- -f2)-release"
         ;;
     devel)
-        SWIFT_BRANCH="swift-6.2-branch"
+        LATEST_TOOLCHAIN_VERSION=$(curl -sL https://github.com/apple/swift/tags | grep -m1 swift-6.2-DEV | cut -d- -f8-10)
+        SWIFT_TAG="swift-6.2-DEVELOPMENT-SNAPSHOT-${LATEST_TOOLCHAIN_VERSION}-a"
+        SWIFT_BRANCH="swift-$(echo $SWIFT_TAG | cut -d- -f2)-branch"
         ;;
     trunk)
+        LATEST_TOOLCHAIN_VERSION=$(curl -sL https://github.com/apple/swift/tags | grep -m1 swift-DEV | cut -d- -f7-9)
+        SWIFT_TAG="swift-DEVELOPMENT-SNAPSHOT-${LATEST_TOOLCHAIN_VERSION}-a"
         SWIFT_BRANCH="development"
         ;;
     *)
-        echo "Unknown build version: ${BUILD_VERSION}"
+        echo "$0: invalid BUILD_VERSION=${BUILD_VERSION}"
         exit 1
         ;;
 esac
 
+ANDROID_API=28
+ANDROID_NDK_VERSION=android-ndk-r27c
+
 # Build the Docker image
-$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_BRANCH=$SWIFT_BRANCH -t swift-android .
+$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_BRANCH=$SWIFT_BRANCH --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
 # Check-out the sources
-scripts/fetch-source.sh --source-dir source
+scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
 
 mkdir -p products
 
@@ -52,4 +61,4 @@ $DOCKER run -it --rm \
           -v ./source:/source \
           -v ./products:/products \
           swift-android \
-          /scripts/build.sh --source-dir /source --products-dir /products
+          /scripts/build.sh --source-dir /source --products-dir /products --android-api ${ANDROID_API} --host-toolchain /usr/local/swift --archs ${TARGET_ARCHS}

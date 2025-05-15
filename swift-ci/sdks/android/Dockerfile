@@ -67,14 +67,14 @@ RUN chmod ugo+x /scripts/install-swift.sh
 RUN /scripts/install-swift.sh
 ENV PATH="/usr/local/swift/bin:${PATH}"
 
-ARG NDK_VERSION=android-ndk-r27c
+ARG ANDROID_NDK_VERSION=android-ndk-r27c
 
-ENV NDK_VERSION=$NDK_VERSION
+ENV ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION
 
 COPY scripts/install-ndk.sh /scripts/install-ndk.sh
 RUN chmod ugo+x /scripts/install-ndk.sh
 RUN /scripts/install-ndk.sh
-ENV ANDROID_NDK_HOME="/usr/local/ndk/${NDK_VERSION}"
+ENV ANDROID_NDK_HOME="/usr/local/ndk/${ANDROID_NDK_VERSION}"
 
 ENV SWIFT_VERSION=$SWIFT_VERSION \
     LIBXML2_VERSION=$LIBXML2_VERSION \
