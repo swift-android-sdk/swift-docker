@@ -62,10 +62,10 @@ ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
 
 COPY scripts/install-swift.sh /scripts/install-swift.sh
 RUN chmod ugo+x /scripts/install-swift.sh
-RUN /scripts/install-swift.sh "${SWIFT_TOOLCHAIN_URL}"
+RUN /scripts/install-swift.sh
 ENV PATH="/usr/local/swift/bin:${PATH}"
 
-ARG ANDROID_NDK_VERSION=android-ndk-r27c
+ARG ANDROID_NDK_VERSION=
 
 ENV ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION
 

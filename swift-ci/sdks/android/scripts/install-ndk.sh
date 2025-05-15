@@ -13,7 +13,13 @@ echo "Installing Android NDK"
 mkdir -p /usr/local/ndk
 pushd /usr/local/ndk >/dev/null
 
-NDKFILE=${NDK_VERSION}-linux.zip
+if [[ "${ANDROID_NDK_VERSION}" == "" ]]; then
+    echo "$0: Missing ANDROID_NDK_VERSION environment"
+    exit 1
+fi
+
+
+NDKFILE=${ANDROID_NDK_VERSION}-linux.zip
 
 NDKURL="https://dl.google.com/android/repository/${NDKFILE}"
 echo "Going to fetch ${NDKURL}"

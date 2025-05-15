@@ -8,7 +8,11 @@
 
 set -e
 
-SWIFT_TOOLCHAIN_URL=$1
+if [[ "${SWIFT_TOOLCHAIN_URL}" == "" ]]; then
+    echo "$0: Missing SWIFT_TOOLCHAIN_URL environment"
+    exit 1
+fi
+
 echo "Installing Swift from: ${SWIFT_TOOLCHAIN_URL}"
 
 # Make a temporary directory
