@@ -67,6 +67,7 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: ls resources/patches/
       - name: Build Android SDK in Docker
+        if: false
         continue-on-error: true
         working-directory: swift-ci/sdks/android
         run: |

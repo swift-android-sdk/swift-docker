@@ -168,6 +168,8 @@ fi
 
 script_dir=$(dirname -- "${BASH_SOURCE[0]}")
 resource_dir="${script_dir}/../resources"
+patches_dir=$(realpath "${script_dir}/../patches")
+ls -la ${patches_dir}
 
 # Find the version numbers of the various dependencies
 function describe {
@@ -241,8 +243,7 @@ function run() {
 header "Patching Sources"
 
 quiet_pushd ${source_dir}
-    PATCHDIR="${resource_dir}/patches"
-    patch=$(realpath "${PATCHDIR}/swift-android.patch")
+    patch="${patches_dir}/swift-android.patch"
 
     # patch the patch, which seems to only be needed for an API less than 28
     # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
@@ -261,9 +262,9 @@ quiet_pushd ${source_dir}
     fi
 
     if [ "${BUILD_VERSION}" = 'release' ]; then
-        testing_patch=$(realpath "${PATCHDIR}/swift-android-testing-release.patch")
+        testing_patch="${patches_dir}/swift-android-testing-release.patch"
     else
-        testing_patch=$(realpath "${PATCHDIR}/swift-android-testing-except-release.patch")
+        testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
     fi
 
     if git apply --reverse --check "$testing_patch" >/dev/null 2>&1; then
