@@ -210,6 +210,10 @@ HOST=linux-x86_64
 #HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 ndk_installation=$ndk_home/toolchains/llvm/prebuilt/$HOST
 
+# ANDROID_NDK env needed by the swift-android.patch for:
+# call ln -sf "${SWIFT_BUILD_PATH}/lib/swift" "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib"
+export ANDROID_NDK=$ndk_home
+
 echo "Swift found at ${swift_dir}"
 echo "Host toolchain found at ${host_toolchain}"
 ${host_toolchain}/bin/swift --version
@@ -491,21 +495,6 @@ if [ ! -d "${ndk_prebuilt}" ]; then
 fi
 
 ndk_sysroot=${ndk_prebuilt}/linux-x86_64/sysroot
-
-ln -sf "${host_toolchain}/lib/swift" "${ndk_sysroot}/usr/lib"
-
-# ensure that the expected compiler resource is found
-ls -la s/usr/local/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/x86_64/swiftrt.o
-
-## need to fixup swiftrt.o in ANDROID_NDK_HOME
-#host_swift_dir=$(dirname $(dirname $(which swift)))
-#for folder in swift swift_static; do
-#    for swiftrt in ${swift_resources}/usr/lib/${folder}-*/android/*/swiftrt.o; do
-#        arch=$(basename $(dirname ${swiftrt}))
-#        mkdir -p ${ndk_sysroot}/usr/lib/${folder}/android/${arch}
-#        cp -av ${swiftrt} ${ndk_sysroot}/usr/lib/${folder}/android/${arch}/
-#    done
-#done
 
 #Pkg.Revision = 27.0.12077973
 #Pkg.Revision = 28.1.13356709
