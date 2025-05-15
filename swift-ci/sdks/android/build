@@ -23,8 +23,24 @@ case $(arch) in
         ;;
 esac
 
+case "${BUILD_VERSION}" in
+    release)
+        SWIFT_BRANCH="swift-6.1-branch"
+        ;;
+    devel)
+        SWIFT_BRANCH="swift-6.2-branch"
+        ;;
+    trunk)
+        SWIFT_BRANCH="development"
+        ;;
+    *)
+        echo "Unknown build version: ${BUILD_VERSION}"
+        exit 1
+        ;;
+esac
+
 # Build the Docker image
-$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX -t swift-android .
+$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_BRANCH=$SWIFT_BRANCH -t swift-android .
 
 # Check-out the sources
 scripts/fetch-source.sh --source-dir source

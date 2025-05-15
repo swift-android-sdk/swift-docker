@@ -18,6 +18,9 @@ ARG ZLIB_VERSION=1.3.1
 # Architecture to build on (empty means x86-64)
 ARG OS_ARCH_SUFFIX=
 
+# the branch name to use for the Swift build
+ARG SWIFT_BRANCH=
+
 # ............................................................................
 
 # Install development tools
@@ -50,7 +53,7 @@ ARG SWIFT_SIGNING_KEY=E813C892820A6FA13755B268F167DF1ACF9CE069
 ARG SWIFT_PLATFORM=ubuntu
 ARG OS_MAJOR_VER=24
 ARG OS_MINOR_VER=04
-ARG SWIFT_WEBROOT=https://download.swift.org/swift-6.2-branch
+ARG SWIFT_WEBROOT=https://download.swift.org/$SWIFT_BRANCH
 
 ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
     SWIFT_PLATFORM=$SWIFT_PLATFORM \
@@ -63,7 +66,6 @@ COPY scripts/install-swift.sh /scripts/install-swift.sh
 RUN chmod ugo+x /scripts/install-swift.sh
 RUN /scripts/install-swift.sh
 ENV PATH="/usr/local/swift/bin:${PATH}"
-
 
 ARG NDK_VERSION=android-ndk-r27c
 
