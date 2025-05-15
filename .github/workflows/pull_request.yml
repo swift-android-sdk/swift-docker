@@ -37,7 +37,7 @@ jobs:
         run: ./build
 
    android-build:
-     name: Build Android ${{ matrix.swift-version }} ${{ matrix.arch }} SDK
+     name: Build Android ${{ matrix.build-type }} ${{ matrix.swift-version }} ${{ matrix.arch }} SDK
      strategy:
        fail-fast: false
        matrix:
@@ -48,6 +48,7 @@ jobs:
          # build both the quick (x86_64) and complete (aarch64,x86_64,armv7) SDKs
          arch: ['x86_64', '']
          swift-version: ['release', 'devel', 'trunk']
+         build-type: ['docker', 'local']
      runs-on: ubuntu-24.04
      steps:
       - name: Free Disk Space
@@ -67,13 +68,16 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: ls resources/patches/
       - name: Install Dependencies
+        if: ${{ matrix.build-type == 'local' }}
         run: |
           sudo apt install -q ninja-build patchelf
-      - name: Build Android SDK
+      - name: Build Android SDK (Local)
+        if: ${{ matrix.build-type == 'local' }}
         working-directory: swift-ci/sdks/android
         run: |
           BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-local
-      - name: Build Android SDK in Docker
+      - name: Build Android SDK (Docker)
+        if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
           BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build

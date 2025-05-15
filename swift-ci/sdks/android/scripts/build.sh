@@ -170,8 +170,6 @@ script_dir=$(dirname -- "${BASH_SOURCE[0]}")
 resource_dir=$(realpath "${script_dir}/../resources")
 patches_dir="${resource_dir}/patches"
 
-ls -la ${patches_dir}
-
 # Find the version numbers of the various dependencies
 function describe {
     pushd $1 >/dev/null 2>&1

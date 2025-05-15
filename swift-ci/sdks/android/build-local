@@ -69,10 +69,10 @@ fi
 
 mkdir -p ${SDKROOT}/products
 
-# Check-out the sources
-if [[ ! -d ${SDKROOT}/src ]]; then
-    scripts/fetch-source.sh --source-dir ${SDKROOT}/src --swift-tag ${SWIFT_TAG}
-fi
+./scripts/fetch-source.sh --source-dir ${SDKROOT}/src --swift-tag ${SWIFT_TAG}
+
+echo "CHECKING SOURCES: ${SDKROOT}/src"
+ls -la ${SDKROOT}/src
 
 ./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs ${TARGET_ARCHS} ${@}
 
