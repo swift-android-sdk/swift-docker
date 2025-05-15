@@ -64,10 +64,14 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt install -q ninja-build patchelf
-      - name: Build Android SDK
+      - name: Build Android SDK in Docker
         working-directory: swift-ci/sdks/android
         run: |
           BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build
+      - name: Build Android SDK
+        working-directory: swift-ci/sdks/android
+        run: |
+          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-local
       - name: Get artifact info
         id: info
         shell: bash
