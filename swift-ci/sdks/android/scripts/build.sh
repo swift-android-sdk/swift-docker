@@ -232,11 +232,6 @@ function run() {
 }
 
 for arch in $archs; do
-    # enable short-circuiting the individual builds
-    if [[ ! -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
-        continue
-    fi
-
     case $arch in
         armv7) target_host="arm-linux-androideabi"; compiler_target_host="armv7a-linux-androideabi$android_api"; android_abi="armeabi-v7a" ;;
         aarch64) target_host="aarch64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="arm64-v8a" ;;
@@ -629,13 +624,11 @@ EOF
 
 quiet_popd
 
-if [[ -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
-    header "Outputting compressed bundle"
+header "Outputting compressed bundle"
 
-    quiet_pushd "${build_dir}"
-        mkdir -p "${products_dir}"
-        tar czf "${products_dir}/${bundle}.tar.gz" "${bundle}"
-    quiet_popd
-fi
+quiet_pushd "${build_dir}"
+    mkdir -p "${products_dir}"
+    tar czf "${products_dir}/${bundle}.tar.gz" "${bundle}"
+quiet_popd
 
 groupend

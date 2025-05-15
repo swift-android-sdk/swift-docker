@@ -6,6 +6,12 @@
 #
 # ===----------------------------------------------------------------------===
 
+# default architectures to build for
+TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
+
+ANDROID_NDK_VERSION=android-ndk-r27c
+ANDROID_API=28
+
 if [[ "$DOCKER" == "" ]]; then
     DOCKER=docker
 fi
@@ -26,15 +32,11 @@ esac
 HOST_OS=ubuntu24.04
 source ./scripts/toolchain-vars.sh
 
-ANDROID_API=28
-ANDROID_NDK_VERSION=android-ndk-r27c
-
 # Build the Docker image
 $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
-# Check-out the sources
+# Check-out and patch the sources
 ./scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
-
 ./scripts/patch-sources.sh source
 
 mkdir -p products
