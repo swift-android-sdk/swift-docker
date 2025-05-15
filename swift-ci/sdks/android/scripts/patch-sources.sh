@@ -18,11 +18,6 @@ if [[ ! -d "${patches_dir}" ]]; then
     exit 1
 fi
 
-if [[ "${BUILD_VERSION}" == "" ]]; then
-    echo "$0: BUILD_VERSION environment is not set"
-    exit 1
-fi
-
 cd ${source_dir}/swift-project
 swift_android_patch="${patches_dir}/swift-android.patch"
 
@@ -33,13 +28,28 @@ perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $swift_android_patch
 # remove the need to link in android-execinfo
 perl -pi -e 's/dispatch android-execinfo/dispatch/g' $swift_android_patch
 
-if [ "${BUILD_VERSION}" = 'release' ]; then
-    testing_patch="${patches_dir}/swift-android-testing-release.patch"
-else
-    testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
-fi
+case "${BUILD_VERSION}" in
+    release)
+        testing_patch="${patches_dir}/swift-android-testing-release.patch"
+        ;;
+    devel)
+        testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
+        ;;
+    trunk)
+        testing_patch="${patches_dir}/swift-android-testing-except-release.patch"
+        dispatch_patch="${patches_dir}/swift-android-trunk-libdispatch.patch"
+        ;;
+    *)
+        echo "$0: invalid BUILD_VERSION=${BUILD_VERSION}"
+        exit 1
+        ;;
+esac
 
-for patch in "$swift_android_patch" "$testing_patch"; do
+for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
+    if [[ "${patch}" == "" ]]; then
+        continue
+    fi
+
     echo "applying patch $patch in $PWD…"
 
     if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
@@ -59,4 +69,3 @@ perl -pi -e 's/os\(Android\)/os\(AndroidDISABLED\)/g' swift-testing/Sources/Test
 # need to un-apply libandroid-spawn since we don't need it for API28+
 perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
 perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
-
