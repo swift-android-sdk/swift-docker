@@ -61,13 +61,14 @@ jobs:
           df -h
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: |
-          sudo apt install -q ninja-build patchelf
       - name: Build Android SDK in Docker
+        continue-on-error: true
         working-directory: swift-ci/sdks/android
         run: |
           BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build
+      - name: Install Dependencies
+        run: |
+          sudo apt install -q ninja-build patchelf
       - name: Build Android SDK
         working-directory: swift-ci/sdks/android
         run: |

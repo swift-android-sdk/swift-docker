@@ -42,6 +42,7 @@ RUN apt-get -q update \
     uuid-runtime \
     tzdata \
     curl \
+    unzip \
     && rm -rf /var/lib/apt-lists/*
 
 # Install Swift
@@ -60,12 +61,18 @@ ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
 
 COPY scripts/install-swift.sh /scripts/install-swift.sh
 RUN chmod ugo+x /scripts/install-swift.sh
-
 RUN /scripts/install-swift.sh
-
 ENV PATH="/usr/local/swift/bin:${PATH}"
 
+
+ARG NDK_VERSION=android-ndk-r27c
+
+ENV NDK_VERSION=$NDK_VERSION
+
+COPY scripts/install-ndk.sh /scripts/install-ndk.sh
+RUN chmod ugo+x /scripts/install-ndk.sh
 RUN /scripts/install-ndk.sh
+ENV ANDROID_NDK_HOME="/usr/local/ndk/${NDK_VERSION}"
 
 ENV SWIFT_VERSION=$SWIFT_VERSION \
     LIBXML2_VERSION=$LIBXML2_VERSION \

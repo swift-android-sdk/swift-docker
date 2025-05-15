@@ -238,6 +238,53 @@ function run() {
     "$@"
 }
 
+header "Patching Sources"
+
+quiet_pushd ${source_dir}
+    PATCHDIR="${resource_dir}/patches"
+    patch=$(realpath "${PATCHDIR}/swift-android.patch")
+
+    # patch the patch, which seems to only be needed for an API less than 28
+    # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
+    perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $patch
+
+    # remove the need to link in android-execinfo
+    perl -pi -e 's/dispatch android-execinfo/dispatch/g' $patch
+
+    if git apply --reverse --check "$patch" >/dev/null 2>&1; then
+        echo "already patched"
+    elif git apply "$patch" >/dev/null 2>&1; then
+        echo "done"
+    else
+        echo "failed"
+        exit 1
+    fi
+
+    if [ "${BUILD_VERSION}" = 'release' ]; then
+        testing_patch=$(realpath "${PATCHDIR}/swift-android-testing-release.patch")
+    else
+        testing_patch=$(realpath "${PATCHDIR}/swift-android-testing-except-release.patch")
+    fi
+
+    if git apply --reverse --check "$testing_patch" >/dev/null 2>&1; then
+        echo "already patched"
+    elif git apply "$testing_patch" >/dev/null 2>&1; then
+        echo "done"
+    else
+        echo "failed"
+        exit 1
+    fi
+
+    perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+    # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
+    perl -pi -e 's/os\(Android\)/os\(AndroidDISABLED\)/g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+
+    # need to un-apply libandroid-spawn since we don't need it for API28+
+    perl -pi -e 's/MATCHES "Android"/MATCHES "AndroidDISABLED"/g' llbuild/lib/llvm/Support/CMakeLists.txt
+    perl -pi -e 's/ STREQUAL Android\)/ STREQUAL AndroidDISABLED\)/g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+
+quiet_popd
+
 for arch in $archs; do
     # enable short-circuiting the individual builds
     if [[ ! -z "$SWIFT_ANDROID_ARCHIVEONLY" ]]; then
