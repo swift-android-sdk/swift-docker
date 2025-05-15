@@ -483,11 +483,29 @@ if [ -z "${ANDROID_NDK_HOME}" ]; then
     echo "$(basename $0): error: missing environment variable ANDROID_NDK_HOME"
     exit 1
 fi
+
 ndk_prebuilt="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt"
 if [ ! -d "${ndk_prebuilt}" ]; then
     echo "$(basename $0): error: ANDROID_NDK_HOME not found: ${ndk_prebuilt}"
     exit 1
 fi
+
+ndk_sysroot=${ndk_prebuilt}/linux-x86_64/sysroot
+
+ln -sf "${host_toolchain}/lib/swift" "${ndk_sysroot}/usr/lib"
+
+# ensure that the expected compiler resource is found
+ls -la s/usr/local/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/x86_64/swiftrt.o
+
+## need to fixup swiftrt.o in ANDROID_NDK_HOME
+#host_swift_dir=$(dirname $(dirname $(which swift)))
+#for folder in swift swift_static; do
+#    for swiftrt in ${swift_resources}/usr/lib/${folder}-*/android/*/swiftrt.o; do
+#        arch=$(basename $(dirname ${swiftrt}))
+#        mkdir -p ${ndk_sysroot}/usr/lib/${folder}/android/${arch}
+#        cp -av ${swiftrt} ${ndk_sysroot}/usr/lib/${folder}/android/${arch}/
+#    done
+#done
 
 #Pkg.Revision = 27.0.12077973
 #Pkg.Revision = 28.1.13356709
