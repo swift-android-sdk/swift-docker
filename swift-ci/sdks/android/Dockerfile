@@ -18,8 +18,8 @@ ARG ZLIB_VERSION=1.3.1
 # Architecture to build on (empty means x86-64)
 ARG OS_ARCH_SUFFIX=
 
-# the branch name to use for the Swift build
-ARG SWIFT_BRANCH=
+# the Swift toolchain URL to download
+ARG SWIFT_TOOLCHAIN_URL=
 
 # ............................................................................
 
@@ -53,18 +53,16 @@ ARG SWIFT_SIGNING_KEY=E813C892820A6FA13755B268F167DF1ACF9CE069
 ARG SWIFT_PLATFORM=ubuntu
 ARG OS_MAJOR_VER=24
 ARG OS_MINOR_VER=04
-ARG SWIFT_WEBROOT=https://download.swift.org/$SWIFT_BRANCH
 
 ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
     SWIFT_PLATFORM=$SWIFT_PLATFORM \
     OS_MAJOR_VER=$OS_MAJOR_VER \
     OS_MINOR_VER=$OS_MINOR_VER \
-    OS_VER=$SWIFT_PLATFORM$OS_MAJOR_VER.$OS_MINOR_VER \
-    SWIFT_WEBROOT="$SWIFT_WEBROOT/$SWIFT_PLATFORM$OS_MAJOR_VER$OS_MINOR_VER$OS_ARCH_SUFFIX"
+    OS_VER=$SWIFT_PLATFORM$OS_MAJOR_VER.$OS_MINOR_VER
 
 COPY scripts/install-swift.sh /scripts/install-swift.sh
 RUN chmod ugo+x /scripts/install-swift.sh
-RUN /scripts/install-swift.sh
+RUN /scripts/install-swift.sh "${SWIFT_TOOLCHAIN_URL}"
 ENV PATH="/usr/local/swift/bin:${PATH}"
 
 ARG ANDROID_NDK_VERSION=android-ndk-r27c

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 #
 # ===----------------------------------------------------------------------===
 #
@@ -45,11 +45,16 @@ case "${BUILD_VERSION}" in
         ;;
 esac
 
+# FIXME: this is the host operating system, but we need the Docker OS
+HOST_OS=ubuntu24.04
+SWIFT_BASE=$SWIFT_TAG-$HOST_OS
+SWIFT_TOOLCHAIN_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_OS | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
+
 ANDROID_API=28
 ANDROID_NDK_VERSION=android-ndk-r27c
 
 # Build the Docker image
-$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_BRANCH=$SWIFT_BRANCH --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
+$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
 # Check-out the sources
 scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}

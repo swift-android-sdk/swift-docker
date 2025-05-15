@@ -256,16 +256,13 @@ quiet_pushd ${source_dir}/swift-project
     for patch in "$swift_android_patch" "$testing_patch"; do
         echo "applying patch $patch in $PWD…"
 
-        if git apply --reverse --check "$patch" >/dev/null 2>&1 ; then
+        if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
             echo "already patched"
-        elif git apply "$patch" ; then
+        elif git apply -C1 "$patch" ; then
             echo "done"
         else
             echo "failed to apply patch $patch in $PWD"
-            # tolerate failed patches in trunk for now
-            if [[ "${BUILD_VERSION}" != 'trunk' ]]; then
-                exit 1
-            fi
+            exit 1
         fi
     done
 

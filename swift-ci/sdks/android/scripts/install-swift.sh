@@ -8,15 +8,8 @@
 
 set -e
 
-echo "Installing Swift"
-
-# Get latest toolchain info
-latest_build=$(curl -s ${SWIFT_WEBROOT}/latest-build.yml)
-download=$(echo "$latest_build" | grep '^download: ' | sed 's/^download: //g')
-download_signature=$(echo "$latest_build " | grep '^download_signature: ' | sed 's/^download_signature: //g')
-download_dir=$(echo "$latest_build" | grep '^dir: ' | sed 's/^dir: //g')
-
-echo "Latest build is ${download_dir}"
+SWIFT_TOOLCHAIN_URL=$1
+echo "Installing Swift from: ${SWIFT_TOOLCHAIN_URL}"
 
 # Make a temporary directory
 tmpdir=$(mktemp -d)
@@ -29,13 +22,13 @@ pushd "$tmpdir" >/dev/null
 export GNUPGHOME="$tmpdir"
 
 # Fetch the toolchain and signature
-echo "Going to fetch ${SWIFT_WEBROOT}/${download_dir}/${download}"
+echo "Going to fetch ${SWIFT_TOOLCHAIN_URL}"
 
-curl -fsSL "${SWIFT_WEBROOT}/${download_dir}/${download}" -o toolchain.tar.gz
+curl -fsSL "${SWIFT_TOOLCHAIN_URL}" -o toolchain.tar.gz
 
-echo "Going to fetch ${SWIFT_WEBROOT}/${download_dir}/${download_signature}"
+echo "Going to fetch ${SWIFT_TOOLCHAIN_URL}.sig"
 
-curl -fsSL "${SWIFT_WEBROOT}/${download_dir}/${download_signature}" -o toolchain.sig
+curl -fsSL "${SWIFT_TOOLCHAIN_URL}.sig" -o toolchain.sig
 
 echo "Fetching keys"
 

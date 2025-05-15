@@ -41,13 +41,13 @@ case "${BUILD_VERSION}" in
 esac
 
 SWIFT_BASE=$SWIFT_TAG-$HOST_OS
+SWIFT_TOOLCHAIN_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_OS | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
 
 if [[ ! -d "$SWIFT_ROOT/$SWIFT_BASE" ]]; then
     mkdir -p $SWIFT_ROOT
     pushd $SWIFT_ROOT
 
-    SWIFT_URL="https://download.swift.org/$SWIFT_BRANCH/$(echo $HOST_OS | tr -d '.')/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
-    wget -q $SWIFT_URL
+    wget -q $SWIFT_TOOLCHAIN_URL
     tar xzf $SWIFT_BASE.tar.gz
 
     popd
