@@ -24,6 +24,7 @@ source ./scripts/toolchain-vars.sh
 ./scripts/patch-sources.sh ${WORKDIR}/source
 
 mkdir -p ${WORKDIR}/products
+chmod ugo+rwx ${WORKDIR}/products
 
 if [[ "$DOCKER" == "" ]]; then
     DOCKER=docker

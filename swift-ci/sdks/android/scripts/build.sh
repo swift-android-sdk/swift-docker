@@ -248,7 +248,6 @@ echo "  - curl ${curl_version}"
 echo "  - BoringSSL ${boringssl_version}"
 
 # make sure the products_dir is writeable
-mount
 ls -lad $products_dir
 touch $products_dir/products_dir_write_test.tmp
 rm $products_dir/products_dir_write_test.tmp
@@ -494,15 +493,16 @@ for arch in $archs; do
     rsync -a ${sdk_staging}/${arch}/usr ${swift_res_root}
 done
 
+rm -r ${swift_res_root}/usr/share/{doc,man}
+rm -r ${sdk_staging}
+
+# create an install script to set up the NDK links
+#ANDROID_NDK_HOME="/opt/homebrew/share/android-ndk"
+mkdir scripts/
+
 ndk_sysroot="ndk-sysroot"
 
-# whether to include the ndk-sysroot in the SDK bundle
-INCLUDE_NDK_SYSROOT=${INCLUDE_NDK_SYSROOT:-0}
-if [[ ${INCLUDE_NDK_SYSROOT} != 1 ]]; then
-    # if we do not include the NDK, then create an install script
-    #ANDROID_NDK_HOME="/opt/homebrew/share/android-ndk"
-    mkdir scripts/
-    cat > scripts/setup-android-sdk.sh <<'EOF'
+cat > scripts/setup-android-sdk.sh <<'EOF'
 #/bin/bash
 # this script will setup the ndk-sysroot with links to the
 # local installation indicated by ANDROID_NDK_HOME
@@ -518,8 +518,6 @@ if [ ! -d "${ndk_prebuilt}" ]; then
     exit 1
 fi
 
-ndk_sysroot=${ndk_prebuilt}/linux-x86_64/sysroot
-
 #Pkg.Revision = 27.0.12077973
 #Pkg.Revision = 28.1.13356709
 ndk_version=$(grep '^Pkg.Revision = ' "${ANDROID_NDK_HOME}/source.properties" | cut -f3- -d' ' | cut -f 1 -d '.')
@@ -528,7 +526,7 @@ if [[ "${ndk_version}" -lt 27 ]]; then
     exit 1
 fi
 
-cd $(dirname $(dirname $(realpath $0)))
+cd $(dirname $(dirname $(realpath -- "${BASH_SOURCE[0]}")))
 swift_resources=swift-resources
 ndk_sysroot=ndk-sysroot
 
@@ -537,7 +535,6 @@ if [[ -d "${ndk_sysroot}" ]]; then
     rm -rf ${ndk_sysroot}
     ndk_re="re-"
 fi
-
 
 # link vs. copy the NDK files
 SWIFT_ANDROID_NDK_LINK=${SWIFT_ANDROID_NDK_LINK:-1}
@@ -570,38 +567,8 @@ done
 
 echo "$(basename $0): success: ndk-sysroot ${ndk_action} to Android NDK at ${ndk_prebuilt}"
 EOF
-    chmod +x scripts/setup-android-sdk.sh
-else
-    COPY_NDK_SYSROOT=${COPY_NDK_SYSROOT:-1}
-    if [[ ${COPY_NDK_SYSROOT} == 1 ]]; then
-        cp -a ${ndk_installation}/sysroot ${ndk_sysroot}
-    else
-        # rather than copying the sysroot, we can instead make links to
-        # the various sub-folders this won't work for the distribution,
-        # since the NDK is going to be located in different places
-        # for different machines
-        mkdir -p ${ndk_sysroot}/usr/lib
-        ln -sv $(realpath ${ndk_installation}/sysroot/usr/include) ${ndk_sysroot}/usr/include
-        for triplePath in ${ndk_installation}/sysroot/usr/lib/*; do
-            triple=$(basename ${triplePath})
-            ln -sv $(realpath ${triplePath}) ${ndk_sysroot}/usr/lib/${triple}
-            ls ${ndk_sysroot}/usr/lib/${triple}/
-        done
-    fi
 
-    # need to manually copy over swiftrt.o or else:
-    # error: link command failed with exit code 1 (use -v to see invocation)
-    # clang: error: no such file or directory: '${HOME}/.swiftpm/swift-sdks/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-04-24-a-android-0.1.artifactbundle/swift-android/ndk-sysroot/usr/lib/swift/android/x86_64/swiftrt.o'
-    # see: https://github.com/swiftlang/swift-driver/pull/1822#issuecomment-2762811807
-    # should be fixed by: https://github.com/swiftlang/swift/pull/79621
-    for arch in $archs; do
-        mkdir -p ${ndk_sysroot}/usr/lib/swift/android/${arch}
-        ln -srv ${swift_res_root}/usr/lib/swift-${arch}/android/${arch}/swiftrt.o ${ndk_sysroot}/usr/lib/swift/android/${arch}/swiftrt.o
-    done
-fi
-
-rm -r ${swift_res_root}/usr/share/{doc,man}
-rm -r ${sdk_staging}
+chmod +x scripts/setup-android-sdk.sh
 
 cat > swift-sdk.json <<EOF
 {
@@ -659,7 +626,8 @@ header "Outputting compressed bundle"
 
 quiet_pushd "${build_dir}"
     mkdir -p "${products_dir}"
-    tar czf "${products_dir}/${bundle}.tar.gz" "${bundle}"
+    tar czf "${bundle}.tar.gz" "${bundle}"
+    mv "${bundle}.tar.gz" "${products_dir}"
 quiet_popd
 
 groupend
