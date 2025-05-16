@@ -55,7 +55,7 @@ mkdir -p ${SDKROOT}/products
 
 ./scripts/build.sh \
     --source-dir ${SDKROOT}/source \
-    --products-dir ${SDKROOT}/products
+    --products-dir ${SDKROOT}/products \
     --build-dir ${SDKROOT}/build \
     --host-toolchain ${HOST_TOOLCHAIN} \
     --android-api ${ANDROID_API} \
