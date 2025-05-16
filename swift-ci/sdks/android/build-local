@@ -38,7 +38,6 @@ $HOST_TOOLCHAIN/bin/swift --version
 export PATH=$HOST_TOOLCHAIN/bin:$PATH
 
 export ANDROID_NDK_HOME=${SDKROOT}/ndk/${ANDROID_NDK_VERSION}
-export ANDROID_NDK=${ANDROID_NDK_HOME}
 
 if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
     mkdir -p $(dirname ${ANDROID_NDK_HOME})
@@ -51,7 +50,14 @@ fi
 
 mkdir -p ${SDKROOT}/products
 
-./scripts/fetch-source.sh --source-dir ${SDKROOT}/src --swift-tag ${SWIFT_TAG}
-./scripts/patch-sources.sh ${SDKROOT}/src
+./scripts/fetch-source.sh --source-dir ${SDKROOT}/source --swift-tag ${SWIFT_TAG}
+./scripts/patch-sources.sh ${SDKROOT}/source
 
-./scripts/build.sh --products-dir ${SDKROOT}/products --source-dir ${SDKROOT}/src --build-dir ${SDKROOT}/build --ndk-home ${ANDROID_NDK_HOME} --android-api ${ANDROID_API} --host-toolchain ${HOST_TOOLCHAIN} --archs ${TARGET_ARCHS} ${@}
+./scripts/build.sh \
+    --source-dir ${SDKROOT}/source \
+    --products-dir ${SDKROOT}/products
+    --build-dir ${SDKROOT}/build \
+    --host-toolchain ${HOST_TOOLCHAIN} \
+    --android-api ${ANDROID_API} \
+    --ndk-home ${ANDROID_NDK_HOME} \
+    --archs ${TARGET_ARCHS} ${@}
