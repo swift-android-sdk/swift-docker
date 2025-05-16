@@ -12,14 +12,14 @@ TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
 
-SDKROOT=${RUNNER_TEMP:-${TMPDIR:-'/tmp'}}/swift-android-sdk
-mkdir -p ${SDKROOT}
+# note that WORKDIR must not be under the current checkout or the patches will fail to apply
+WORKDIR=${RUNNER_TEMP:-${TMPDIR:-'/tmp'}}/swift-android-sdk
+mkdir -p ${WORKDIR}
 
-# Install a Swift host toolchain if it isn't already present
 HOST_OS=ubuntu$(lsb_release -sr)
 source ./scripts/toolchain-vars.sh
 
-SWIFT_ROOT=${SDKROOT}/host-toolchain
+SWIFT_ROOT=${WORKDIR}/host-toolchain
 if [[ ! -d "$SWIFT_ROOT/$SWIFT_BASE" ]]; then
     mkdir -p $SWIFT_ROOT
     pushd $SWIFT_ROOT
@@ -37,7 +37,7 @@ $HOST_TOOLCHAIN/bin/swift --version
 # ensure the correct Swift is first in the PATH
 export PATH=$HOST_TOOLCHAIN/bin:$PATH
 
-export ANDROID_NDK_HOME=${SDKROOT}/ndk/${ANDROID_NDK_VERSION}
+export ANDROID_NDK_HOME=${WORKDIR}/ndk/${ANDROID_NDK_VERSION}
 
 if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
     mkdir -p $(dirname ${ANDROID_NDK_HOME})
@@ -50,15 +50,15 @@ fi
 
 
 # Check-out and patch the sources
-./scripts/fetch-source.sh --source-dir ${SDKROOT}/source --swift-tag ${SWIFT_TAG}
-./scripts/patch-sources.sh ${SDKROOT}/source
+./scripts/fetch-source.sh --source-dir ${WORKDIR}/source --swift-tag ${SWIFT_TAG}
+./scripts/patch-sources.sh ${WORKDIR}/source
 
-mkdir -p ${SDKROOT}/products
+mkdir -p ${WORKDIR}/products
 
 ./scripts/build.sh \
-    --source-dir ${SDKROOT}/source \
-    --products-dir ${SDKROOT}/products \
-    --build-dir ${SDKROOT}/build \
+    --source-dir ${WORKDIR}/source \
+    --products-dir ${WORKDIR}/products \
+    --build-dir ${WORKDIR}/build \
     --host-toolchain ${HOST_TOOLCHAIN} \
     --android-api ${ANDROID_API} \
     --ndk-home ${ANDROID_NDK_HOME} \
