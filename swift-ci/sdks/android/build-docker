@@ -42,10 +42,10 @@ $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLC
 mkdir -p products
 
 echo "build-script-impl start ========="
-ls -la $(find ${SDKROOT}/source -name build-script-impl)
+ls -la $(find source -name build-script-impl)
 cat $(find source -name build-script-impl)
 echo "build-script-impl end  ========="
-grep 'VALIDATING SYMBOLIC LINK' $(find ${SDKROOT}/source -name build-script-impl)
+grep 'VALIDATING SYMBOLIC LINK' $(find source -name build-script-impl)
 
 
 $DOCKER run -i --rm \

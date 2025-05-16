@@ -55,7 +55,7 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     fi
 
     echo "applying patch $patch in $PWD…"
-    git apply -v -C1 "$patch"
+    git apply -v --unsafe-paths -C1 "$patch"
 
     #if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
     #    echo "already patched"
