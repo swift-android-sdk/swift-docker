@@ -91,12 +91,13 @@ jobs:
 
           ARTIFACT_EXT=".artifactbundle.tar.gz"
           ARTIFACT_NAME="$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
+          # depending on whether we are building locally or in a container, add a maker to the name
+          if [[ "${{ matrix.build-type }}" == 'local' ]]; then
+            ARTIFACT_NAME="${ARTIFACT_NAME}-local"
+          fi
           # artifacts need a unique name so we suffix with the matrix arch(s)
           if [[ ! -z "${{ matrix.arch }}" ]]; then
             ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')"
-          fi
-          if [[ "${{ matrix.build-type }}" == 'local' ]]; then
-            ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')-local"
           fi
           ARTIFACT_NAME="${ARTIFACT_NAME}${ARTIFACT_EXT}"
 

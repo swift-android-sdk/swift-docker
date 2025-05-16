@@ -49,7 +49,7 @@ $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLC
 
 $DOCKER run -i --rm \
           -v ${WORKDIR}/source:/source \
-          -v ${WORKDIR}/products:/products \
+          -v ${WORKDIR}/products:/products:rw \
           ${CONTAINER_NAME} \
           /scripts/build.sh \
             --source-dir /source \

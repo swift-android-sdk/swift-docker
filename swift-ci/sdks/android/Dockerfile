@@ -6,15 +6,6 @@
 
 FROM ubuntu:24.04
 
-# Versions to fetch
-
-ARG SWIFT_VERSION=scheme:release/6.2
-ARG LIBXML2_VERSION=2.12.7
-ARG CURL_VERSION=8.7.1
-ARG BORINGSSL_VERSION=fips-20220613
-ARG ICU_VERSION=maint/maint-69
-ARG ZLIB_VERSION=1.3.1
-
 # Architecture to build on (empty means x86-64)
 ARG OS_ARCH_SUFFIX=
 
@@ -81,6 +72,8 @@ ENV SWIFT_VERSION=$SWIFT_VERSION \
     BORINGSSL_VERSION=$BORINGSSL_VERSION \
     ICU_VERSION=$ICU_VERSION \
     ZLIB_VERSION=$ZLIB_VERSION
+
+ENV SWIFT_BUILD_DOCKER="1"
 
 COPY scripts /scripts
 RUN chmod ugo+x /scripts/*

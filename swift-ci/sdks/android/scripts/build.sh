@@ -168,6 +168,11 @@ fi
 # Find the version numbers of the various dependencies
 function describe {
     pushd $1 >/dev/null 2>&1
+    # this is needed for docker containers or else we get the error:
+    # fatal: detected dubious ownership in repository at '/source/curl'
+    if [[ "${SWIFT_BUILD_DOCKER}" == "1" ]]; then
+        git config --global --add safe.directory $(pwd)
+    fi
     git describe --tags
     popd >/dev/null 2>&1
 }
