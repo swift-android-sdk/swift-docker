@@ -48,10 +48,12 @@ if [[ ! -d ${ANDROID_NDK_HOME} ]]; then
     popd
 fi
 
-mkdir -p ${SDKROOT}/products
 
+# Check-out and patch the sources
 ./scripts/fetch-source.sh --source-dir ${SDKROOT}/source --swift-tag ${SWIFT_TAG}
 ./scripts/patch-sources.sh ${SDKROOT}/source
+
+mkdir -p ${SDKROOT}/products
 
 ./scripts/build.sh \
     --source-dir ${SDKROOT}/source \

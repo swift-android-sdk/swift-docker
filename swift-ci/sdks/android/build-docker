@@ -41,7 +41,6 @@ $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLC
 
 mkdir -p products
 
-# Run the build
 $DOCKER run -i --rm \
           -v ./source:/source \
           -v ./products:/products \
