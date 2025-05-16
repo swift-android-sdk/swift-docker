@@ -208,10 +208,22 @@ header "Swift Android SDK build script"
 swift_dir=$(realpath $(dirname "$swiftc")/..)
 HOST=linux-x86_64
 #HOST=$(uname -s -m | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
+# in a Docker container, the pre-installed NDK is read-only,
+# but the build script needs to write to it to work around
+# https://github.com/swiftlang/swift-driver/pull/1822
+# so we copy it to a read-write location for the purposes of the build
+# this can all be removed once that PR lands
+mkdir -p ${build_dir}/ndk/
+ndk_home_tmp=${build_dir}/ndk/$(basename $ndk_home)
+cp -a $ndk_home $ndk_home_tmp
+ndk_home=$ndk_home_tmp
+
 ndk_installation=$ndk_home/toolchains/llvm/prebuilt/$HOST
 
 # ANDROID_NDK env needed by the swift-android.patch for:
 # call ln -sf "${SWIFT_BUILD_PATH}/lib/swift" "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib"
+export ANDROID_NDK_HOME=$ndk_home
 export ANDROID_NDK=$ndk_home
 
 echo "Swift found at ${swift_dir}"
