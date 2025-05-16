@@ -21,6 +21,10 @@ fi
 cd ${source_dir}/swift-project
 swift_android_patch="${patches_dir}/swift-android.patch"
 
+ls -la swift/utils/build-script-impl
+ls -la ${swift_android_patch}
+ls -la swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+
 # patch the patch, which seems to only be needed for an API less than 28
 # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
 perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $swift_android_patch
@@ -55,7 +59,9 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     fi
 
     echo "applying patch $patch in $PWD…"
-    git apply -v --unsafe-paths -C1 "$patch"
+    # first check to make sure the patches can apply and fail if not
+    git apply -v --check -C1 "$patch"
+    git apply -v -C1 "$patch"
 
     #if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
     #    echo "already patched"
