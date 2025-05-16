@@ -11,6 +11,14 @@ TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
+HOST_OS=ubuntu24.04
+source ./scripts/toolchain-vars.sh
+
+# Check-out and patch the sources
+./scripts/fetch-source.sh --source-dir ${PWD}/source --swift-tag ${SWIFT_TAG}
+./scripts/patch-sources.sh ${PWD}/source
+
+mkdir -p products
 
 if [[ "$DOCKER" == "" ]]; then
     DOCKER=docker
@@ -29,29 +37,15 @@ case $(arch) in
         ;;
 esac
 
-HOST_OS=ubuntu24.04
-source ./scripts/toolchain-vars.sh
+CONTAINER_NAME="swift-android"
 
 # Build the Docker image
-$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
-
-# Check-out and patch the sources
-./scripts/fetch-source.sh --source-dir ${PWD}/source --swift-tag ${SWIFT_TAG}
-./scripts/patch-sources.sh ${PWD}/source
-
-mkdir -p products
-
-echo "build-script-impl start ========="
-ls -la $(find source -name build-script-impl)
-cat $(find source -name build-script-impl)
-echo "build-script-impl end  ========="
-grep 'VALIDATING SYMBOLIC LINK' $(find source -name build-script-impl)
-
+$DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t ${CONTAINER_NAME} .
 
 $DOCKER run -i --rm \
           -v ./source:/source \
           -v ./products:/products \
-          swift-android \
+          ${CONTAINER_NAME} \
           /scripts/build.sh \
             --source-dir /source \
             --products-dir /products \

@@ -55,12 +55,6 @@ fi
 
 mkdir -p ${SDKROOT}/products
 
-echo "build-script-impl start ========="
-ls -la $(find ${SDKROOT}/source -name build-script-impl)
-cat $(find ${SDKROOT}/source -name build-script-impl)
-echo "build-script-impl end  ========="
-grep 'VALIDATING SYMBOLIC LINK' $(find ${SDKROOT}/source -name build-script-impl)
-
 ./scripts/build.sh \
     --source-dir ${SDKROOT}/source \
     --products-dir ${SDKROOT}/products \

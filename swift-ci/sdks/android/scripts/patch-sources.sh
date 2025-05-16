@@ -21,10 +21,6 @@ fi
 cd ${source_dir}/swift-project
 swift_android_patch="${patches_dir}/swift-android.patch"
 
-ls -la swift/utils/build-script-impl
-ls -la ${swift_android_patch}
-ls -la swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
-
 # patch the patch, which seems to only be needed for an API less than 28
 # https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
 perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' $swift_android_patch
@@ -61,6 +57,7 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     echo "applying patch $patch in $PWD…"
     # first check to make sure the patches can apply and fail if not
     git apply -v --check -C1 "$patch"
+    echo "git apply --check result: $0"
     git apply -v -C1 "$patch"
 
     #if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
@@ -73,6 +70,11 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     #fi
 done
 
+# validate the patches
+ls -la swift/utils/build-script-impl
+grep 'VALIDATING SYMBOLIC LINK' swift/utils/build-script-impl
+
+
 perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
 # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
 perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
@@ -80,3 +82,4 @@ perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-testing/Sources/Test
 # need to un-apply libandroid-spawn since we don't need it for API28+
 perl -pi -e 's;MATCHES "Android";MATCHES "AndroidDISABLED";g' llbuild/lib/llvm/Support/CMakeLists.txt
 perl -pi -e 's; STREQUAL Android\); STREQUAL AndroidDISABLED\);g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+
