@@ -247,6 +247,13 @@ echo "  - libxml2 ${libxml2_version}"
 echo "  - curl ${curl_version}"
 echo "  - BoringSSL ${boringssl_version}"
 
+# make sure the products_dir is writeable
+mount
+ls -lad $products_dir
+touch $products_dir/products_dir_write_test.tmp
+rm $products_dir/products_dir_write_test.tmp
+#chown -R $(id -u):$(id -g) $products_dir
+
 function run() {
     echo "$@"
     "$@"
