@@ -41,6 +41,7 @@ RUN apt-get -q update \
     libpython3-dev        \
     libsqlite3-dev        \
     libxml2-dev           \
+    rsync \
     uuid-dev \
     uuid-runtime \
     tzdata \

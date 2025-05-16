@@ -95,6 +95,9 @@ jobs:
           if [[ ! -z "${{ matrix.arch }}" ]]; then
             ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')"
           fi
+          if [[ "${{ matrix.build-type }}" == 'local' ]]; then
+            ARTIFACT_NAME="${ARTIFACT_NAME}-$(echo ${{ matrix.arch }} | tr ',' '-')-local"
+          fi
           ARTIFACT_NAME="${ARTIFACT_NAME}${ARTIFACT_EXT}"
 
           # There is no way to prevent even a single-file artifact from being zipped:
