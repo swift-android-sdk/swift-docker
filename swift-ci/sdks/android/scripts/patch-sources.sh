@@ -55,15 +55,16 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     fi
 
     echo "applying patch $patch in $PWD…"
+    git apply -C1 "$patch"
 
-    if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
-        echo "already patched"
-    elif git apply -C1 "$patch" ; then
-        echo "done"
-    else
-        echo "failed to apply patch $patch in $PWD"
-        exit 1
-    fi
+    #if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
+    #    echo "already patched"
+    #elif git apply -C1 "$patch" ; then
+    #    echo "done"
+    #else
+    #    echo "failed to apply patch $patch in $PWD"
+    #    exit 1
+    #fi
 done
 
 perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift

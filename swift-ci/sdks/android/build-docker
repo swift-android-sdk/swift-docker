@@ -36,8 +36,8 @@ source ./scripts/toolchain-vars.sh
 $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLCHAIN_URL=$SWIFT_TOOLCHAIN_URL --build-arg ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION -t swift-android .
 
 # Check-out and patch the sources
-./scripts/fetch-source.sh --source-dir source --swift-tag ${SWIFT_TAG}
-./scripts/patch-sources.sh source
+./scripts/fetch-source.sh --source-dir ${PWD}/source --swift-tag ${SWIFT_TAG}
+./scripts/patch-sources.sh ${PWD}/source
 
 mkdir -p products
 
