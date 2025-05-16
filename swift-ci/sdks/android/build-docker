@@ -41,6 +41,10 @@ $DOCKER build --build-arg OS_ARCH_SUFFIX=$OS_ARCH_SUFFIX --build-arg SWIFT_TOOLC
 
 mkdir -p products
 
+echo "build-script-impl start ========="
+cat $(find source -name build-script-impl)
+echo "build-script-impl end  ========="
+
 $DOCKER run -i --rm \
           -v ./source:/source \
           -v ./products:/products \

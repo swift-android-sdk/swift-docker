@@ -30,7 +30,7 @@ perl -pi -e 's;dispatch android-execinfo;dispatch;g' $swift_android_patch
 
 # debug symbolic link setup
 perl -pi -e 's;call ln -sf;call ln -svf;g' $swift_android_patch
-perl -pi -e 's%linux-x86_64/sysroot/usr/lib"%linux-x86_64/sysroot/usr/lib"; echo "VALIDATING SYMBOLIC LINK"; ls -la "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib"; ls -la "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift"; %g' $swift_android_patch
+perl -pi -e 's%linux-x86_64/sysroot/usr/lib"%linux-x86_64/sysroot/usr/lib"; echo "VALIDATING SYMBOLIC LINK"; ls -la "\${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib"; ls -la "\${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift"; %g' $swift_android_patch
 
 case "${BUILD_VERSION}" in
     release)

@@ -55,6 +55,10 @@ fi
 
 mkdir -p ${SDKROOT}/products
 
+echo "build-script-impl start ========="
+cat $(find ${SDKROOT}/source -name build-script-impl)
+echo "build-script-impl end  ========="
+
 ./scripts/build.sh \
     --source-dir ${SDKROOT}/source \
     --products-dir ${SDKROOT}/products \
