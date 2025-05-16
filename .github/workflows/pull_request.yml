@@ -80,11 +80,14 @@ jobs:
         shell: bash
         run: |
           set -ex
+          ls -la ${{ runner.temp }}
+          ls -la ${{ runner.temp }}/swift-android-sdk
+          ls -la ${{ runner.temp }}/swift-android-sdk/products
           SWIFT_ROOT=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)
           echo "swift-root=${SWIFT_ROOT}" >> $GITHUB_OUTPUT
           echo "swift-path=${SWIFT_ROOT}/usr/bin/swift" >> $GITHUB_OUTPUT
 
-          ARTIFACT_BUILD=$(realpath ${{ runner.temp }}/swift-android-sdk/build/*.artifactbundle)
+          #ARTIFACT_BUILD=$(realpath ${{ runner.temp }}/swift-android-sdk/build/*.artifactbundle)
           ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
           echo "sdk-id=x86_64-unknown-linux-android28" >> $GITHUB_OUTPUT
@@ -108,7 +111,7 @@ jobs:
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
           # show an abridged tree
-          tree ${ARTIFACT_BUILD} --filesfirst --prune -P 'Android.swiftmodule' -P 'libswiftAndroid.*' -P 'libFoundation.*' -P 'swiftrt.o' -P 'swift*.json' -P 'info.json' -P 'api-level.h' -P 'android.modulemap' -P 'SwiftAndroidNDK.h' -P 'bridging.modulemap' -P 'linux' -P 'libclang*.a' -P 'libunwind.a' -P 'libclang_rt.builtins-*-android.a'
+          #tree ${ARTIFACT_BUILD} --filesfirst --prune -P 'Android.swiftmodule' -P 'libswiftAndroid.*' -P 'libFoundation.*' -P 'swiftrt.o' -P 'swift*.json' -P 'info.json' -P 'api-level.h' -P 'android.modulemap' -P 'SwiftAndroidNDK.h' -P 'bridging.modulemap' -P 'linux' -P 'libclang*.a' -P 'libunwind.a' -P 'libclang_rt.builtins-*-android.a'
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:
