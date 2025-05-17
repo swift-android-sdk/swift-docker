@@ -132,7 +132,7 @@ jobs:
         run: |
           # need to free up some space or else when installing we get: No space left on device
           df -h
-          rm -rf ${WORKDIR}/{build,src}
+          rm -rf ${WORKDIR}/{build,source}
           sudo docker image prune --all --force
           sudo docker builder prune -a
           df -h
