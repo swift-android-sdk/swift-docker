@@ -87,8 +87,8 @@ jobs:
         run: |
           # when building in a Docker container, we don't have a host toolchain
           # locally, but we need one in order to run the SDK validation tests
+          HOST_OS=ubuntu$(lsb_release -sr)
           source ./scripts/toolchain-vars.sh
-          export SWIFT_TOOLCHAIN_URL=${SWIFT_TOOLCHAIN_URL}
           mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
           ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift
           ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift/bin/swift --version
