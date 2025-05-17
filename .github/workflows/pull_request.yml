@@ -85,13 +85,14 @@ jobs:
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
-          # when building in a Docker container, we don't have a host toolchain
-          # locally, but we need one in order to run the SDK validation tests
+          # when building in a Docker container, we don't have a local host toolchain,
+          # but we need one in order to run the SDK validation tests, so we install it now
           HOST_OS=ubuntu$(lsb_release -sr)
           source ./scripts/toolchain-vars.sh
           mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
-          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift
-          ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift/bin/swift --version
+          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain
+          ls ${{ runner.temp }}/swift-android-sdk/host-toolchain
+          ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift --version
       - name: Get artifact info
         id: info
         shell: bash

@@ -21,13 +21,7 @@ source ./scripts/toolchain-vars.sh
 
 SWIFT_ROOT=${WORKDIR}/host-toolchain
 if [[ ! -d "$SWIFT_ROOT/$SWIFT_BASE" ]]; then
-    mkdir -p $SWIFT_ROOT
-    pushd $SWIFT_ROOT
-
-    wget -q $SWIFT_TOOLCHAIN_URL
-    tar xzf $SWIFT_BASE.tar.gz
-
-    popd
+    ./scripts/install-swift.sh ${SWIFT_ROOT}
 fi
 
 #HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
