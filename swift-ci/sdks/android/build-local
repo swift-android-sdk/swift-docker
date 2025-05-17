@@ -14,7 +14,7 @@ ANDROID_API=28
 
 export BUILD_VERSION=${1}
 # note that WORKDIR must not be under the current checkout or the patches will fail to apply
-WORKDIR=${1}
+WORKDIR=${2}
 if [[ "${WORKDIR}" == '' ]]; then
     echo "Usage: $(basename $0) <release/devel/trunk> <work directory>"
     exit 1
