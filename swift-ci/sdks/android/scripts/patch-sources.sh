@@ -61,8 +61,7 @@ for patch in "$swift_android_patch" "$testing_patch" "$dispatch_patch"; do
     echo "applying patch $patch in $PWD…"
     # first check to make sure the patches can apply and fail if not
     git apply -v --check -C1 "$patch"
-    echo "git apply --check result: $0"
-    git apply -v -C1 "$patch"
+    git apply --no-index -v -C1 "$patch"
 
     #if git apply -C1 --reverse --check "$patch" >/dev/null 2>&1 ; then
     #    echo "already patched"
