@@ -61,4 +61,4 @@ mkdir -p ${WORKDIR}/products
     --host-toolchain ${HOST_TOOLCHAIN} \
     --android-api ${ANDROID_API} \
     --ndk-home ${ANDROID_NDK_HOME} \
-    --archs ${TARGET_ARCHS} ${@}
+    --archs ${TARGET_ARCHS}
