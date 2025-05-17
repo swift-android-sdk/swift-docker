@@ -90,7 +90,7 @@ jobs:
           HOST_OS=ubuntu$(lsb_release -sr)
           source ./scripts/toolchain-vars.sh
           mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
-          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain
+          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/$SWIFT_BASE/usr
           ls ${{ runner.temp }}/swift-android-sdk/host-toolchain
           ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift --version
       - name: Get artifact info

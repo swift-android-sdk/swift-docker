@@ -20,12 +20,11 @@ HOST_OS=ubuntu$(lsb_release -sr)
 source ./scripts/toolchain-vars.sh
 
 SWIFT_ROOT=${WORKDIR}/host-toolchain
+HOST_TOOLCHAIN=$SWIFT_ROOT/$SWIFT_BASE/usr
 if [[ ! -d "$SWIFT_ROOT/$SWIFT_BASE" ]]; then
-    ./scripts/install-swift.sh ${SWIFT_ROOT}
+    ./scripts/install-swift.sh ${HOST_TOOLCHAIN}
 fi
 
-#HOST_TOOLCHAIN=${HOST_TOOLCHAIN:-$(dirname $(dirname $(which swiftc)))}
-HOST_TOOLCHAIN=$SWIFT_ROOT/$SWIFT_BASE/usr
 $HOST_TOOLCHAIN/bin/swift --version
 
 # ensure the correct Swift is first in the PATH
