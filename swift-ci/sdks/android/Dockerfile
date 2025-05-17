@@ -54,7 +54,7 @@ ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
 
 COPY scripts/install-swift.sh /scripts/install-swift.sh
 RUN chmod ugo+x /scripts/install-swift.sh
-RUN /scripts/install-swift.sh
+RUN /scripts/install-swift.sh /usr/local/swift
 ENV PATH="/usr/local/swift/bin:${PATH}"
 
 ARG ANDROID_NDK_VERSION=

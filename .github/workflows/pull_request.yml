@@ -60,6 +60,12 @@ jobs:
           sudo docker image prune --all --force
           sudo docker builder prune -a
           df -h
+      - name: Setup
+        run: |
+          # these variabes are used by build-docker and build-local
+          # to determine which Swift version to build for
+          echo "BUILD_VERSION=${{ matrix.swift-version }}" >> $GITHUB_ENV
+          echo "TARGET_ARCHS=${{ matrix.arch }}" >> $GITHUB_ENV
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -69,12 +75,22 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: |
           sudo apt install -q ninja-build patchelf
-          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-local
+          ./build-local
       - name: Build Android SDK (Docker)
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
-          BUILD_VERSION=${{ matrix.swift-version }} TARGET_ARCHS=${{ matrix.arch }} ./build-docker
+          ./build-docker
+      - name: Install Host Toolchain
+        if: ${{ matrix.build-type == 'docker' }}
+        working-directory: swift-ci/sdks/android
+        run: |
+          # when building in a Docker container, we don't have a host toolchain
+          # locally, but we need one in order to run the SDK validation tests
+          source ./scripts/toolchain-vars.sh
+          mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
+          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift
+          ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift/bin/swift --version
       - name: Get artifact info
         id: info
         shell: bash
@@ -87,7 +103,6 @@ jobs:
           echo "swift-root=${SWIFT_ROOT}" >> $GITHUB_OUTPUT
           echo "swift-path=${SWIFT_ROOT}/usr/bin/swift" >> $GITHUB_OUTPUT
 
-          #ARTIFACT_BUILD=$(realpath ${{ runner.temp }}/swift-android-sdk/build/*.artifactbundle)
           ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
           echo "sdk-id=x86_64-unknown-linux-android28" >> $GITHUB_OUTPUT
@@ -109,9 +124,6 @@ jobs:
           # so the actual artifact download will look like:
           # swift-6.1-RELEASE_android-0.1-x86_64.artifactbundle.tar.gz.zip
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
-
-          # show an abridged tree
-          #tree ${ARTIFACT_BUILD} --filesfirst --prune -P 'Android.swiftmodule' -P 'libswiftAndroid.*' -P 'libFoundation.*' -P 'swiftrt.o' -P 'swift*.json' -P 'info.json' -P 'api-level.h' -P 'android.modulemap' -P 'SwiftAndroidNDK.h' -P 'bridging.modulemap' -P 'linux' -P 'libclang*.a' -P 'libunwind.a' -P 'libclang_rt.builtins-*-android.a'
       - name: Upload SDK artifactbundle
         uses: actions/upload-artifact@v4
         with:

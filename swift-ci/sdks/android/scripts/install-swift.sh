@@ -13,7 +13,13 @@ if [[ "${SWIFT_TOOLCHAIN_URL}" == "" ]]; then
     exit 1
 fi
 
-echo "Installing Swift from: ${SWIFT_TOOLCHAIN_URL}"
+destination=$1
+if [[ "${destination}" == "" ]]; then
+    echo "$0: Usage: $(basename $0) <swift installation directory>"
+    exit 1
+fi
+
+echo "Installing Swift from: ${SWIFT_TOOLCHAIN_URL} into: ${destination}"
 
 # Make a temporary directory
 tmpdir=$(mktemp -d)
@@ -45,9 +51,9 @@ gpg --batch --verify toolchain.sig toolchain.tar.gz
 # Extract and install the toolchain
 echo "Extracting Swift"
 
-mkdir -p /usr/local/swift
-tar -xzf toolchain.tar.gz --directory /usr/local/swift --strip-components=2
-chmod -R o+r /usr/local/swift/lib/swift
+mkdir -p ${destination}
+tar -xzf toolchain.tar.gz --directory ${destination} --strip-components=2
+chmod -R o+r ${destination}/lib/swift
 
 popd >/dev/null
 
