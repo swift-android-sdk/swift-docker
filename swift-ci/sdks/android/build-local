@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 #
 # ===----------------------------------------------------------------------===
 #
@@ -12,16 +12,22 @@ TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
 
+export BUILD_VERSION=${1}
 # note that WORKDIR must not be under the current checkout or the patches will fail to apply
-WORKDIR=${RUNNER_TEMP:-${TMPDIR:-'/tmp'}}/swift-android-sdk
+WORKDIR=${1}
+if [[ "${WORKDIR}" == '' ]]; then
+    echo "Usage: $(basename $0) <release/devel/trunk> <work directory>"
+    exit 1
+fi
 mkdir -p ${WORKDIR}
+WORKDIR=$(realpath ${WORKDIR})
 
 HOST_OS=ubuntu$(lsb_release -sr)
 source ./scripts/toolchain-vars.sh
 
 SWIFT_ROOT=${WORKDIR}/host-toolchain
 HOST_TOOLCHAIN=$SWIFT_ROOT/$SWIFT_BASE/usr
-if [[ ! -d "$SWIFT_ROOT/$SWIFT_BASE" ]]; then
+if [[ ! -d "$HOST_TOOLCHAIN" ]]; then
     ./scripts/install-swift.sh ${HOST_TOOLCHAIN}
 fi
 

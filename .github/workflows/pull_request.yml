@@ -61,11 +61,13 @@ jobs:
           sudo docker builder prune -a
           df -h
       - name: Setup
+        id: config
         run: |
           # these variabes are used by build-docker and build-local
           # to determine which Swift version to build for
           echo "BUILD_VERSION=${{ matrix.swift-version }}" >> $GITHUB_ENV
           echo "TARGET_ARCHS=${{ matrix.arch }}" >> $GITHUB_ENV
+          echo "WORKDIR=${{ runner.temp }}/swift-android-sdk" >> $GITHUB_ENV
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -75,12 +77,12 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: |
           sudo apt install -q ninja-build patchelf
-          ./build-local
+          ./build-local ${BUILD_VERSION} ${WORKDIR}
       - name: Build Android SDK (Docker)
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
-          ./build-docker
+          ./build-docker ${BUILD_VERSION} ${WORKDIR}
       - name: Install Host Toolchain
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
@@ -89,20 +91,20 @@ jobs:
           # but we need one in order to run the SDK validation tests, so we install it now
           HOST_OS=ubuntu$(lsb_release -sr)
           source ./scripts/toolchain-vars.sh
-          mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
-          ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/$SWIFT_BASE/usr
-          ls ${{ runner.temp }}/swift-android-sdk/host-toolchain
-          ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr/bin/swift --version
+          mkdir -p ${WORKDIR}/host-toolchain
+          ./scripts/install-swift.sh ${WORKDIR}/host-toolchain/$SWIFT_BASE/usr
+          ls ${WORKDIR}/host-toolchain
+          ${WORKDIR}/host-toolchain/*/usr/bin/swift --version
       - name: Get artifact info
         id: info
         shell: bash
         run: |
           set -ex
-          SWIFT_ROOT=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)
+          SWIFT_ROOT=$(dirname ${WORKDIR}/host-toolchain/*/usr)
           echo "swift-root=${SWIFT_ROOT}" >> $GITHUB_OUTPUT
           echo "swift-path=${SWIFT_ROOT}/usr/bin/swift" >> $GITHUB_OUTPUT
 
-          ARTIFACT_PATH=$(realpath ${{ runner.temp }}/swift-android-sdk/products/*.artifactbundle.tar.gz)
+          ARTIFACT_PATH=$(realpath ${WORKDIR}/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
           echo "sdk-id=x86_64-unknown-linux-android28" >> $GITHUB_OUTPUT
 
@@ -133,7 +135,7 @@ jobs:
         run: |
           # need to free up some space or else when installing we get: No space left on device
           df -h
-          rm -rf ${{ runner.temp }}/swift-android-sdk/{build,src}
+          rm -rf ${WORKDIR}/{build,src}
           df -h
       - name: Install artifactbundle
         shell: bash
