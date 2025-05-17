@@ -88,6 +88,7 @@ jobs:
           # when building in a Docker container, we don't have a host toolchain
           # locally, but we need one in order to run the SDK validation tests
           source ./scripts/toolchain-vars.sh
+          export SWIFT_TOOLCHAIN_URL=${SWIFT_TOOLCHAIN_URL}
           mkdir -p ${{ runner.temp }}/swift-android-sdk/host-toolchain
           ./scripts/install-swift.sh ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift
           ${{ runner.temp }}/swift-android-sdk/host-toolchain/swift/bin/swift --version
@@ -96,9 +97,6 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ls -la ${{ runner.temp }}
-          ls -la ${{ runner.temp }}/swift-android-sdk
-          ls -la ${{ runner.temp }}/swift-android-sdk/products
           SWIFT_ROOT=$(dirname ${{ runner.temp }}/swift-android-sdk/host-toolchain/*/usr)
           echo "swift-root=${SWIFT_ROOT}" >> $GITHUB_OUTPUT
           echo "swift-path=${SWIFT_ROOT}/usr/bin/swift" >> $GITHUB_OUTPUT
@@ -143,7 +141,7 @@ jobs:
           ${{ steps.info.outputs.swift-path }} sdk install ${{ steps.info.outputs.artifact-path }}
           ${{ steps.info.outputs.swift-path }} sdk configure --show-configuration $(${{ steps.info.outputs.swift-path }} sdk list | head -n 1) ${{ steps.info.outputs.sdk-id }}
           # recent releases require that ANDROID_NDK_ROOT *not* be set
-          # see https://github.com/finagolfin/swift-android-sdk/issues/207
+          # see https://github.com/swiftlang/swift-driver/pull/1879
           echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
 
       - name: Create Demo Project

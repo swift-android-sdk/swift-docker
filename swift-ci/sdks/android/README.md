@@ -1,11 +1,19 @@
-# Build scripts for Swift Android SDK
+# Dockerfile-based build for Swift Android SDK
+
+This is a Dockerfile-based build set-up for the Swift Android SDK.
+
+To build the Docker container and run the 
+
+```
+$ docker build -t swift-android .
+```
 
 This folder contains scripts to build a Swift Android SDK 
 in the form of an artifactbundle.
 
 ## Running
 
-The top-level `./build` script installs a host toolchain and the
+The top-level `./build-docker` script installs a host toolchain and the
 Android NDK, and then invokes `scripts/fetch-source.sh` which will
 fetch tagged sources for libxml2, curl, boringssl, and swift.
 
@@ -27,7 +35,7 @@ whereas building for all the architectures takes over an hour.
 To build an artifactbundle for just the `x86_64` architecture, run:
 
 ```
-TARGET_ARCHS=x86_64 ./build
+TARGET_ARCHS=aarch64 ./build-docker
 ```
 
 ## Installing and validating the SDK
