@@ -67,8 +67,7 @@ jobs:
           # to determine which Swift version to build for
           echo "BUILD_VERSION=${{ matrix.swift-version }}" >> $GITHUB_ENV
           echo "TARGET_ARCHS=${{ matrix.arch }}" >> $GITHUB_ENV
-          #echo "WORKDIR=${{ runner.temp }}/swift-android-sdk" >> $GITHUB_ENV
-          echo "WORKDIR=/tmp/swift-android-sdk" >> $GITHUB_ENV
+          echo "WORKDIR=${{ runner.temp }}/swift-android-sdk" >> $GITHUB_ENV
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
