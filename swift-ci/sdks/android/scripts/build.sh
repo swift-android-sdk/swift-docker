@@ -621,8 +621,7 @@ EOF
 cat > swift-toolset.json <<EOF
 {
   "cCompiler": { "extraCLIOptions": ["-fPIC"] },
-  "swiftCompiler": { "extraCLIOptions": ["-Xclang-linker", "-fuse-ld=lld"] },
-  "linker": { "extraCLIOptions": ["-z,max-page-size=16384"] },
+  "swiftCompiler": { "extraCLIOptions": ["-Xclang-linker", "-fuse-ld=lld", "-Xclang-linker", "-Wl,-z,max-page-size=16384"] },
   "schemaVersion": "1.0"
 }
 EOF
