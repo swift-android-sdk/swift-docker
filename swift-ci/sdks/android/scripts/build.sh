@@ -385,19 +385,14 @@ for arch in $archs; do
             $build_type_flag \
             --reconfigure \
             --no-assertions \
+            --validation-test=1 \
             --android \
             --android-ndk=$ndk_home \
             --android-arch=$arch \
             --android-api-level=$android_api \
-            --native-swift-tools-path=$host_toolchain/bin \
-            --native-clang-tools-path=$host_toolchain/bin \
             --cross-compile-hosts=android-$arch \
             --cross-compile-deps-path=$sdk_root \
             --install-destdir=$sdk_root \
-            --build-llvm=0 \
-            --build-swift-tools=0 \
-            --skip-build-cmark \
-            --skip-local-build \
             --build-swift-static-stdlib \
             --install-swift \
             --install-libdispatch \
