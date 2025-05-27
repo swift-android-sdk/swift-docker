@@ -58,6 +58,7 @@ mkdir -p ${WORKDIR}/products
     --source-dir ${WORKDIR}/source \
     --products-dir ${WORKDIR}/products \
     --build-dir ${WORKDIR}/build \
+    --build-compiler ${BUILD_COMPILER} \
     --host-toolchain ${HOST_TOOLCHAIN} \
     --android-api ${ANDROID_API} \
     --ndk-home ${ANDROID_NDK_HOME} \

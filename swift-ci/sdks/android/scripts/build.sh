@@ -63,6 +63,7 @@ Options:
   --source-dir <path>   Specify the path in which the sources can be found.
   --ndk-home <path>     Specify the path to the Android NDK
   --host-toolchain <tc> Specify the path to the host Swift toolchain
+  --build-compiler <bc> Whether to build and validate the host compiler
   --products-dir <path> Specify the path in which the products should be written.
   --build-dir <path>    Specify the path in which intermediates should be stored.
   --android-api <api>   Specify the Android API level
@@ -130,6 +131,8 @@ while [ "$#" -gt 0 ]; do
             ndk_home="$2"; shift ;;
         --host-toolchain)
             host_toolchain="$2"; shift ;;
+        --build-compiler)
+            build_compiler="$2"; shift ;;
         --build-dir)
             build_dir="$2"; shift ;;
         --android-api)
@@ -378,6 +381,27 @@ for arch in $archs; do
             RelWithDebInfo) build_type_flag="--release-debuginfo" ;;
         esac
 
+        case $build_compiler in
+            1|true|yes|YES)
+                build_cmark=""
+                local_build=""
+                build_llvm="1"
+                build_swift_tools="1"
+                validation_test="1"
+                native_swift_tools_path=""
+                native_clang_tools_path=""
+                ;;
+            *)
+                build_cmark="--skip-build-cmark"
+                local_build="--skip-local-build"
+                build_llvm="0"
+                build_swift_tools="0"
+                validation_test="0"
+                native_swift_tools_path="--native-swift-tools-path=$host_toolchain/bin"
+                native_clang_tools_path="--native-clang-tools-path=$host_toolchain/bin"
+                ;;
+        esac
+
         # use an out-of-tree build folder, otherwise subsequent arch builds have conflicts
         export SWIFT_BUILD_ROOT=${build_dir}/$arch/swift-project
 
@@ -385,7 +409,7 @@ for arch in $archs; do
             $build_type_flag \
             --reconfigure \
             --no-assertions \
-            --validation-test=1 \
+            --validation-test=$validation_test \
             --android \
             --android-ndk=$ndk_home \
             --android-arch=$arch \
@@ -393,6 +417,12 @@ for arch in $archs; do
             --cross-compile-hosts=android-$arch \
             --cross-compile-deps-path=$sdk_root \
             --install-destdir=$sdk_root \
+            --build-llvm=$build_llvm \
+            --build-swift-tools=$build_swift_tools \
+            ${native_swift_tools_path} \
+            ${native_clang_tools_path} \
+            ${build_cmark} \
+            ${local_build} \
             --build-swift-static-stdlib \
             --install-swift \
             --install-libdispatch \
