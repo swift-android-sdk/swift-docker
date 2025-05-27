@@ -429,6 +429,7 @@ for arch in $archs; do
             --install-foundation \
             --xctest --install-xctest \
             --swift-testing --install-swift-testing \
+            --cross-compile-build-swift-tools=0 \
             --cross-compile-append-host-target-to-destdir=False \
             --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
 
