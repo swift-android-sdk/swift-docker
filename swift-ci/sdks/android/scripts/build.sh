@@ -265,11 +265,31 @@ function run() {
 
 for arch in $archs; do
     case $arch in
-        armv7) target_host="arm-linux-androideabi"; compiler_target_host="armv7a-linux-androideabi$android_api"; android_abi="armeabi-v7a" ;;
-        aarch64) target_host="aarch64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="arm64-v8a" ;;
-        x86_64) target_host="x86_64-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="x86_64" ;;
-        x86) target_host="x86-linux-android"; compiler_target_host="$target_host$android_api"; android_abi="x86" ;;
-        *) echo "Unknown architecture '$1'"; usage; exit 0 ;;
+        armv7)
+            target_host="arm-linux-androideabi"
+            compiler_target_host="armv7a-linux-androideabi$android_api"
+            android_abi="armeabi-v7a"
+            ;;
+        aarch64)
+            target_host="aarch64-linux-android"
+            compiler_target_host="$target_host$android_api"
+            android_abi="arm64-v8a"
+            ;;
+        x86_64)
+            target_host="x86_64-linux-android"
+            compiler_target_host="$target_host$android_api"
+            android_abi="x86_64"
+            ;;
+        x86)
+            target_host="x86-linux-android"
+            compiler_target_host="$target_host$android_api"
+            android_abi="x86"
+            ;;
+        *)
+            echo "Unknown architecture '$1'"
+            usage
+            exit 0
+            ;;
     esac
 
     sdk_root=${build_dir}/sdk_root/${arch}

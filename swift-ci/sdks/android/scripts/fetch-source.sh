@@ -160,7 +160,9 @@ groupend
 
 # Fetch yams (needed for Swift 6.1.1)
 groupstart "Fetching yams"
+pushd swift-project >/dev/null
 [[ -d yams ]] || git clone ${github}jpsim/Yams.git yams
+popd >/dev/null
 groupend
 
 # Fetch libxml2
