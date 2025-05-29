@@ -23,12 +23,13 @@ jobs:
             *.log
 
    android-build:
-     name: Build Android ${{ matrix.build-type }} ${{ matrix.swift-version }} ${{ matrix.arch }} SDK
+     name: Build Android ${{ matrix.build-type }} ${{ matrix.swift-version }} ${{ matrix.arch }} SDK (build-compiler=${{ matrix.build-compiler }})
      strategy:
        fail-fast: false
        matrix:
          #build-type: ['docker']
          build-type: ['docker', 'local']
+         build-compiler: ['0', '1']
          # blank arch builds all (aarch64,x86_64,armv7)
          #arch: ['']
          # builds only x86_64 to speed up the validation
@@ -53,6 +54,8 @@ jobs:
           # these variabes are used by build-docker and build-local
           # to determine which Swift version to build for
           echo "BUILD_SCHEME=${{ matrix.swift-version }}" >> $GITHUB_ENV
+          # pass the build-compiler matrix through to the build script
+          echo "BUILD_COMPILER=${{ matrix.build-compiler }}" >> $GITHUB_ENV
           echo "TARGET_ARCHS=${{ matrix.arch }}" >> $GITHUB_ENV
           echo "WORKDIR=${{ runner.temp }}/swift-android-sdk" >> $GITHUB_ENV
       - name: Checkout repository
@@ -98,6 +101,9 @@ jobs:
           # depending on whether we are building locally or in a container, add a maker to the name
           if [[ "${{ matrix.build-type }}" == 'local' ]]; then
             ARTIFACT_NAME="${ARTIFACT_NAME}-local"
+          fi
+          if [[ "${{ matrix.build-compiler }}" == '1' ]]; then
+            ARTIFACT_NAME="${ARTIFACT_NAME}-hostbuild"
           fi
           # artifacts need a unique name so we suffix with the matrix arch(s)
           if [[ ! -z "${{ matrix.arch }}" ]]; then

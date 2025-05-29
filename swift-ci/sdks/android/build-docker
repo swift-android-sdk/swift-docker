@@ -62,6 +62,7 @@ $DOCKER run -i --rm \
             --source-dir /source \
             --products-dir /products \
             --host-toolchain /usr/local/swift \
+            --build-compiler ${BUILD_COMPILER} \
             --android-api ${ANDROID_API} \
             --ndk-home /usr/local/ndk/${ANDROID_NDK_VERSION} \
             --archs ${TARGET_ARCHS}
