@@ -50,7 +50,7 @@ function groupend {
 
 function usage {
     cat <<EOF
-usage: build.sh --source-dir <path> --products-dir <path> --ndk-home <path> --host-toolchain <path>
+usage: build.sh --source-dir <path> --products-dir <path> --ndk-home <path>
                 [--name <sdk-name>] [--version <version>] [--build-dir <path>]
                 [--archs <arch>[,<arch> ...]]
 
@@ -158,7 +158,7 @@ done
 # Change the commas for spaces
 archs="${archs//,/ }"
 
-if [[ -z "$source_dir" || -z "$products_dir" || -z "$ndk_home" || -z "$host_toolchain" ]]; then
+if [[ -z "$source_dir" || -z "$products_dir" || -z "$ndk_home" ]]; then
     usage
     exit 1
 fi
@@ -237,8 +237,10 @@ export ANDROID_NDK_HOME=$ndk_home
 export ANDROID_NDK=$ndk_home
 
 echo "Swift found at ${swift_dir}"
-echo "Host toolchain found at ${host_toolchain}"
-${host_toolchain}/bin/swift --version
+if [[ ! -z "${host_toolchain}" ]]; then
+    echo "Host toolchain found at ${host_toolchain}"
+    ${host_toolchain}/bin/swift --version
+fi
 echo "Android NDK found at ${ndk_home}"
 ${ndk_installation}/bin/clang --version
 echo "Building for ${archs}"
