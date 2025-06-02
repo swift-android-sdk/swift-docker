@@ -64,7 +64,7 @@ jobs:
         if: ${{ matrix.build-type == 'local' }}
         working-directory: swift-ci/sdks/android
         run: |
-          sudo apt install -q ninja-build patchelf
+          sudo apt install -q patchelf build-essential cmake ninja-build python3 golang git gnupg2 libcurl4-openssl-dev libedit-dev libicu-dev libncurses5-dev libpython3-dev libsqlite3-dev libxml2-dev rsync uuid-dev uuid-runtime tzdata curl unzip
           ./build-local ${BUILD_SCHEME} ${WORKDIR}
       - name: Build Android SDK (Docker)
         if: ${{ matrix.build-type == 'docker' }}
