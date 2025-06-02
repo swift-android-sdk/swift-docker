@@ -165,7 +165,7 @@ groupend
 groupstart "Fetching yams"
 pushd swift-project >/dev/null
 [[ -d yams ]] || git clone ${github}jpsim/Yams.git yams
-pushd libxml2 >/dev/null 2>&1
+pushd yams >/dev/null 2>&1
 git checkout ${YAMS_VERSION}
 popd >/dev/null 2>&1
 popd >/dev/null
