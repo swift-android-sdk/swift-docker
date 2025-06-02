@@ -25,7 +25,7 @@ WORKDIR=$(realpath ${WORKDIR})
 HOST_OS=ubuntu$(lsb_release -sr)
 source ./scripts/toolchain-vars.sh
 
-if [[ "${BUILD_COMPILER}" != "0" ]]; then
+if [[ "${BUILD_COMPILER}" != "1" ]]; then
     SWIFT_ROOT=${WORKDIR}/host-toolchain
     HOST_TOOLCHAIN=$SWIFT_ROOT/$SWIFT_BASE/usr
     if [[ ! -d "$HOST_TOOLCHAIN" ]]; then
