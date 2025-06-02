@@ -57,11 +57,11 @@ ${WORKDIR}/source/swift-android-patches/apply-patches.sh ${WORKDIR}/source/swift
 mkdir -p ${WORKDIR}/products
 
 ./scripts/build.sh \
-    --source-dir ${WORKDIR}/source \
-    --products-dir ${WORKDIR}/products \
-    --build-dir ${WORKDIR}/build \
-    --build-compiler ${BUILD_COMPILER} \
-    --host-toolchain ${HOST_TOOLCHAIN} \
-    --android-api ${ANDROID_API} \
-    --ndk-home ${ANDROID_NDK_HOME} \
-    --archs ${TARGET_ARCHS}
+    --source-dir "${WORKDIR}/source" \
+    --products-dir "${WORKDIR}/products" \
+    --build-dir "${WORKDIR}/build" \
+    --build-compiler "${BUILD_COMPILER}" \
+    --host-toolchain "${HOST_TOOLCHAIN}" \
+    --android-api "${ANDROID_API}" \
+    --ndk-home "${ANDROID_NDK_HOME}" \
+    --archs "${TARGET_ARCHS}"
