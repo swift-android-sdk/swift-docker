@@ -445,6 +445,7 @@ for arch in $archs; do
             ${native_clang_tools_path} \
             ${build_cmark} \
             ${local_build} \
+            --host-test \
             --build-swift-static-stdlib \
             --install-swift \
             --install-libdispatch \
