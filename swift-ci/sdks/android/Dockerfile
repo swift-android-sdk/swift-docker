@@ -18,6 +18,7 @@ ARG SWIFT_TOOLCHAIN_URL=
 RUN apt-get -q update \
     && DEBIAN_FRONTEND=noninteractive apt-get -q install -y \
     build-essential \
+    clang \
     cmake \
     ninja-build \
     python3 \
