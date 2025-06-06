@@ -44,7 +44,7 @@ jobs:
           df -h
           # brings available space from 25G to 32G
           # otherwise we sometimes run out of space during the build
-          sudo rm -rf /usr/share/miniconda /usr/share/az* /usr/share/glade* /usr/local/share/chromium /usr/local/share/powershell /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/miniconda /usr/share/az* /usr/share/glade* /usr/local/share/chromium /usr/local/share/powershell /usr/share/dotnet /opt/ghc /opt/hostedtoolcache /usr/local/graalvm/ /usr/local/.ghcup/ /usr/local/lib/node_modules /usr/local/share/boost
           sudo docker image prune --all --force
           sudo docker builder prune -a
           df -h
