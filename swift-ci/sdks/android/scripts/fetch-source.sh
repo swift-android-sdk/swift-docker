@@ -195,7 +195,7 @@ git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
 groupend
 
-# Fetch BoringSSL
+# Fetch Patches
 groupstart "Fetching Patches"
 [[ -d swift-android-patches ]] || git clone https://github.com/swift-android-sdk/swift-android-sdk swift-android-patches
 pushd swift-android-patches >/dev/null 2>&1
