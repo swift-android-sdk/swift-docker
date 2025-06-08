@@ -2,7 +2,7 @@
 
 <img src="https://swift.org/assets/images/swift.svg" alt="Swift logo" height="70" >
 
-### Docker images for [Swift](https://swift.org).
+###  images for [Swift](https://swift.org).
 
 #### You can find the  Hub repo here: [https://hub.docker.com/_/swift/](https://hub.docker.com/_/swift/)
 
