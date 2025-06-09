@@ -447,7 +447,7 @@ for arch in $archs; do
             ${local_build} \
             --host-test \
             --skip-test-linux \
-            --skip-test-xctest \
+            --skip-test-xctest --skip-test-foundation \
             --build-swift-static-stdlib \
             --install-swift \
             --install-libdispatch \
