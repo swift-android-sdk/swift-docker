@@ -453,12 +453,11 @@ for arch in $archs; do
             --install-libdispatch \
             --install-foundation \
             --xctest --install-xctest \
-            --swift-testing --install-swift-testing \
             --cross-compile-build-swift-tools=0 \
             --llvm-ninja-targets-for-cross-compile-hosts=help \
-            --cross-compile-append-host-target-to-destdir=False \
-            --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
-
+            --cross-compile-append-host-target-to-destdir=False 
+            # --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
+        # --swift-testing --install-swift-testing \
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:
         # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
