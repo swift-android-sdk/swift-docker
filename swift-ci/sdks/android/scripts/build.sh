@@ -424,8 +424,8 @@ for arch in $archs; do
                 ;;
         esac
 
-        # use an out-of-tree build folder, otherwise subsequent arch builds have conflicts
-        export SWIFT_BUILD_ROOT=${build_dir}/$arch/swift-project
+        # use an out-of-tree build folder
+        export SWIFT_BUILD_ROOT=${build_dir}/swift-project
 
         ./swift/utils/build-script \
             $build_type_flag \
