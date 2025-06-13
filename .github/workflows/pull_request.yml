@@ -33,13 +33,21 @@ jobs:
              arch: ''
              build-compiler: '1'
              # self-hosted runner variant
-             runner: 'skip-android-runner'
+             runner: 'self-hosted'
            - swift-version: 'swift-6.2-branch'
              build-type: 'local'
              build-compiler: '0'
              runner: 'ubuntu-24.04'
            - swift-version: 'development'
              build-type: 'local'
+             build-compiler: '0'
+             runner: 'ubuntu-24.04'
+           - swift-version: 'swift-6.2-branch'
+             build-type: 'docker'
+             build-compiler: '0'
+             runner: 'ubuntu-24.04'
+           - swift-version: 'development'
+             build-type: 'docker'
              build-compiler: '0'
              runner: 'ubuntu-24.04'
            - swift-version: 'swift-6.2-branch'
@@ -169,6 +177,7 @@ jobs:
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
       - name: Test Demo Project on Android
         uses: skiptools/swift-android-action@main
+        if: false # disabled because we aren't building Testing
         with:
           # only test for the complete arch SDK build to speed up CI
           #run-tests: ${{ matrix.arch == '' }}
@@ -184,7 +193,6 @@ jobs:
       - name: Test swift-algorithms
         uses: skiptools/swift-android-action@main
         with:
-          run-tests: ${{ matrix.arch == '' }}
           package-path: swift-algorithms
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
