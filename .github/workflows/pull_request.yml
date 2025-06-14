@@ -30,7 +30,6 @@ jobs:
          include:
            - swift-version: 'development'
              build-type: 'docker'
-             arch: ''
              build-compiler: '1'
              # self-hosted runner variant
              runner: 'self-hosted'
@@ -62,6 +61,7 @@ jobs:
      runs-on: ${{ matrix.runner }}
      steps:
       - name: Free Disk Space
+        if: ${{ matrix.runner != 'self-hosted' }}
         run: |
           df -h
           # brings available space from 25G to 32G
@@ -145,6 +145,7 @@ jobs:
           name: ${{ steps.info.outputs.artifact-name }}
           path: ${{ steps.info.outputs.artifact-path }}
       - name: Cleanup
+        if: ${{ matrix.runner != 'self-hosted' }}
         run: |
           # need to free up some space or else when installing we get: No space left on device
           df -h
@@ -153,6 +154,7 @@ jobs:
           sudo docker builder prune -a
           df -h
       - name: Install artifactbundle
+        if: ${{ matrix.runner != 'self-hosted' }}
         shell: bash
         run: |
           set -ex
@@ -163,6 +165,7 @@ jobs:
           echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
 
       - name: Create Demo Project
+        if: ${{ matrix.runner != 'self-hosted' }}
         run: |
           cd ${{ runner.temp }}
           mkdir DemoProject
