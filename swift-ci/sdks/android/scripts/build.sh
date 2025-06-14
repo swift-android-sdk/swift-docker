@@ -114,7 +114,7 @@ declare_package boringssl "boringssl" "OpenSSL AND ISC AND MIT" \
 # Parse command line arguments
 android_sdk_version=0.1
 sdk_name=
-archs=aarch64,armv7,x86_64
+archs=armv7,aarch64,x86_64
 android_api=28
 build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
