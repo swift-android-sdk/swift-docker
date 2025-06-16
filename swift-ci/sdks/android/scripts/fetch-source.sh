@@ -89,6 +89,9 @@ fi
 if [[ -z "${BORINGSSL_VERSION}" ]]; then
     BORINGSSL_VERSION=fips-20220613
 fi
+if [[ -z "${YAMS_VERSION}" ]]; then
+    YAMS_VERSION=5.0.6
+fi
 if [[ -z "${SWIFT_ANDROID_PATCHES_VERSION}" ]]; then
     SWIFT_ANDROID_PATCHES_VERSION=main
 fi
@@ -158,6 +161,16 @@ fi
 popd >/dev/null
 groupend
 
+# Fetch yams (needed for Swift 6.1.x)
+groupstart "Fetching yams"
+pushd swift-project >/dev/null
+[[ -d yams ]] || git clone ${github}jpsim/Yams.git yams
+pushd yams >/dev/null 2>&1
+git checkout ${YAMS_VERSION}
+popd >/dev/null 2>&1
+popd >/dev/null
+groupend
+
 # Fetch libxml2
 groupstart "Fetching libxml2"
 [[ -d libxml2 ]] || git clone ${github}GNOME/libxml2.git
@@ -182,7 +195,7 @@ git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
 groupend
 
-# Fetch BoringSSL
+# Fetch Patches
 groupstart "Fetching Patches"
 [[ -d swift-android-patches ]] || git clone https://github.com/swift-android-sdk/swift-android-sdk swift-android-patches
 pushd swift-android-patches >/dev/null 2>&1
