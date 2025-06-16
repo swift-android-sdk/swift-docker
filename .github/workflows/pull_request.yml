@@ -38,11 +38,11 @@ jobs:
            #  runner: 'self-hosted'
            - swift-version: 'swift-6.2-branch'
              build-type: 'docker'
-             build-compiler: '0'
+             build-compiler: '1'
              runner: 'ubuntu-24.04'
            - swift-version: 'development'
              build-type: 'docker'
-             build-compiler: '0'
+             build-compiler: '1'
              runner: 'ubuntu-24.04'
      runs-on: ${{ matrix.runner }}
      # 12 hour timeout
