@@ -7,7 +7,7 @@
 # ===----------------------------------------------------------------------===
 
 # default architectures to build for
-TARGET_ARCHS=${TARGET_ARCHS:-armv7}
+TARGET_ARCHS=${TARGET_ARCHS:-aarch64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r27c
 ANDROID_API=28
