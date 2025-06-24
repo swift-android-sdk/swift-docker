@@ -35,5 +35,8 @@ case "${BUILD_SCHEME}" in
 esac
 
 SWIFT_BASE=$SWIFT_TAG-$HOST_OS
-export SWIFT_TOOLCHAIN_URL="https://download.swift.org/$SWIFT_BRANCH/$OS/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
-
+if [[ "${BUILD_SCHEME}" == "development" ]]; then
+  export SWIFT_TOOLCHAIN_URL="https://download.swift.org/$SWIFT_BRANCH/$OS/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-$HOST_OS.tar.gz"
+else
+  export SWIFT_TOOLCHAIN_URL="https://download.swift.org/$SWIFT_BRANCH/$OS/$SWIFT_TAG/$SWIFT_BASE.tar.gz"
+fi
