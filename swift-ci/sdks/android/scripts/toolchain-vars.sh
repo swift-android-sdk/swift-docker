@@ -15,9 +15,9 @@
 OS=$(echo $HOST_OS | tr -d '.')
 # e.g., "swift-6.1-RELEASE"
 # there is no latest-build.yml for releases, so we need to get it from the API
-export RELEASE_TAG=$(curl -fsSL https://www.swift.org/api/v1/install/releases.json | jq -r '.[-1].tag')
+RELEASE_TAG=$(curl -fsSL https://www.swift.org/api/v1/install/releases.json | jq -r '.[-1].tag')
 # e.g., "swift-6.1-release"
-export RELEASE_BRANCH=$(echo "${SWIFT_TAG}" | tr '[A-Z]' '[a-z]')
+RELEASE_BRANCH=$(echo "${RELEASE_TAG}" | tr '[A-Z]' '[a-z]')
 
 case "${BUILD_SCHEME}" in
     release)
