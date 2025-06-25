@@ -28,25 +28,25 @@ jobs:
        fail-fast: false
        matrix:
          include:
-           #- swift-version: 'swift-6.2-branch'
-           #  build-type: 'docker'
-           #  build-compiler: '1'
-           #  runner: 'self-hosted'
-           #- swift-version: 'development'
-           #  build-type: 'docker'
-           #  build-compiler: '1'
-           #  runner: 'self-hosted'
            - swift-version: 'swift-6.2-branch'
              build-type: 'docker'
              build-compiler: '1'
-             runner: 'ubuntu-24.04'
+             runner: 'self-hosted'
            - swift-version: 'development'
              build-type: 'docker'
              build-compiler: '1'
+             runner: 'self-hosted'
+           - swift-version: 'swift-6.2-branch'
+             build-type: 'docker'
+             build-compiler: '0'
+             runner: 'ubuntu-24.04'
+           - swift-version: 'development'
+             build-type: 'docker'
+             build-compiler: '0'
              runner: 'ubuntu-24.04'
      runs-on: ${{ matrix.runner }}
-     # 12 hour timeout
-     timeout-minutes: 720
+     # 15 hour timeout
+     timeout-minutes: 900
      steps:
       - name: Free Disk Space
         if: ${{ matrix.runner != 'self-hosted' }}
