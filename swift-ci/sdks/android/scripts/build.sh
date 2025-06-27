@@ -114,7 +114,7 @@ declare_package boringssl "boringssl" "OpenSSL AND ISC AND MIT" \
 # Parse command line arguments
 android_sdk_version=0.1
 sdk_name=
-archs=armv7,x86_64
+archs=armv7,aarch64,x86_64
 android_api=28
 build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
@@ -449,6 +449,7 @@ for arch in $archs; do
             --skip-test-linux \
             --skip-test-xctest --skip-test-foundation \
             --build-swift-static-stdlib \
+            --swift-install-components='clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
             --install-swift \
             --install-libdispatch \
             --install-foundation \
@@ -528,7 +529,7 @@ for arch in $archs; do
             arch_triple="arm-linux-androideabi"
         fi
 
-        rm -r lib/swift{,_static}/clang
+        rm -r lib/swift{,_static}/{clang,linux}
         mv lib/swift lib/swift-$arch
         ln -s ../swift/clang lib/swift-$arch/clang
 
