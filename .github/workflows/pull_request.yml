@@ -168,7 +168,7 @@ jobs:
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
       - name: Test Demo Project on Android
         uses: skiptools/swift-android-action@main
-        if: false # disabled because we aren't building Testing
+        if: ${{ matrix.runner != 'self-hosted' }}
         with:
           # only test for the complete arch SDK build to speed up CI
           #run-tests: ${{ matrix.arch == '' }}
@@ -177,11 +177,13 @@ jobs:
           installed-swift: ${{ steps.info.outputs.swift-root }}
 
       - name: Checkout swift-algorithms
+        if: ${{ matrix.runner != 'self-hosted' }}
         uses: actions/checkout@v4
         with:
           repository: apple/swift-algorithms
           path: swift-algorithms
       - name: Test swift-algorithms
+        if: ${{ matrix.runner != 'self-hosted' }}
         uses: skiptools/swift-android-action@main
         with:
           package-path: swift-algorithms
