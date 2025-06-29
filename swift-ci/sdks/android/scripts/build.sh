@@ -529,7 +529,8 @@ for arch in $archs; do
             arch_triple="arm-linux-androideabi"
         fi
 
-        rm -r lib/swift{,_static}/{clang,linux}
+        # need force rm in case linux is not present (when not running tests)
+        rm -rf lib/swift{,_static}/{clang,linux}
         mv lib/swift lib/swift-$arch
         ln -s ../swift/clang lib/swift-$arch/clang
 
