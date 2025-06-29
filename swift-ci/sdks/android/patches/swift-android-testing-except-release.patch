@@ -111,6 +111,19 @@ index f7f2664b2de..01d36e127c6 100644
  
  // CHECK-DISABLED-NOT: normal_count
  
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index 274b6037305..bf0f7fcf671 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -212,7 +212,7 @@ class Product(object):
+         if self.args.cross_compile_hosts:
+             if self.is_darwin_host(host_target):
+                 install_destdir = self.host_install_destdir(host_target)
+-            else:
++            elif self.args.cross_compile_append_host_target_to_destdir:
+                 install_destdir = os.path.join(install_destdir, self.args.host_target)
+         return targets.toolchain_path(install_destdir,
+                                       self.args.install_prefix)
 diff --git a/swift-corelibs-xctest/cmake/modules/PlatformInfo.cmake b/swift-corelibs-xctest/cmake/modules/PlatformInfo.cmake
 index 468dc61..a90ae3d 100644
 --- a/swift-corelibs-xctest/cmake/modules/PlatformInfo.cmake
