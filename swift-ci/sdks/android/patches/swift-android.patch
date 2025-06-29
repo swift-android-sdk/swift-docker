@@ -96,7 +96,7 @@ index 758dd1df..02970992 100644
  #endif
          try _throwIfPosixError(posix_spawnattr_init(&spawnAttrs))
 -#if os(Android)
-+#if os(Windows)
++#if os(Android)
          guard var spawnAttrs else {
              throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno),
                            userInfo: [NSURLErrorKey:self.executableURL!])
@@ -136,7 +136,7 @@ index e40cb1b..ff2f920 100644
    if(NOT CMAKE_SYSTEM_NAME STREQUAL WASI)
      target_link_libraries(Testing PUBLIC
 -      dispatch)
-+      dispatch android-execinfo)
++      dispatch)
 +    list(GET CMAKE_FIND_ROOT_PATH 0 BT_DIR)
 +    target_include_directories(Testing PUBLIC ${BT_DIR}/usr/include)
 +    target_link_directories(Testing PUBLIC ${BT_DIR}/usr/lib)

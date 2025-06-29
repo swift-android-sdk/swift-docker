@@ -3,18 +3,7 @@
 patches_dir=$(dirname $(realpath -- "${BASH_SOURCE[0]}"))
 cd ${1}
 
-# patch the patch, which seems to only be needed for an API less than 28
-# https://github.com/finagolfin/swift-android-sdk/blob/main/swift-android.patch#L110
-perl -pi -e 's/#if os\(Windows\)/#if os\(Android\)/g' ${patches_dir}/swift-android.patch
-
-# remove the need to link in android-execinfo
-perl -pi -e 's;dispatch android-execinfo;dispatch;g' ${patches_dir}/swift-android.patch
-
 case "${BUILD_SCHEME}" in
-    release)
-        git apply -v -C1 ${patches_dir}/swift-android.patch
-        git apply -v -C1 ${patches_dir}/swift-android-testing-release.patch
-        ;;
     swift-*-branch)
         git apply -v -C1 ${patches_dir}/swift-android.patch
         git apply -v -C1 ${patches_dir}/swift-android-testing-except-release.patch
@@ -30,7 +19,6 @@ case "${BUILD_SCHEME}" in
         ;;
 esac
 
-perl -pi -e 's%String\(cString: getpass%\"fake\" //%' swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
 # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
 perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
 
