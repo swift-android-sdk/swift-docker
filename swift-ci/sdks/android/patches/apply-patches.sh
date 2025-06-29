@@ -21,9 +21,3 @@ esac
 
 # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
 perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
-
-# need to un-apply libandroid-spawn since we don't need it for API28+
-perl -pi -e 's;MATCHES "Android";MATCHES "AndroidDISABLED";g' llbuild/lib/llvm/Support/CMakeLists.txt
-perl -pi -e 's; STREQUAL Android\); STREQUAL AndroidDISABLED\);g' swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
-
-
