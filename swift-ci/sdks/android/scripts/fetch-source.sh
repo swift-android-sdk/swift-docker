@@ -92,9 +92,6 @@ fi
 if [[ -z "${YAMS_VERSION}" ]]; then
     YAMS_VERSION=5.0.6
 fi
-if [[ -z "${SWIFT_ANDROID_PATCHES_VERSION}" ]]; then
-    SWIFT_ANDROID_PATCHES_VERSION=main
-fi
 
 clone_with_ssh=false
 while [ "$#" -gt 0 ]; do
@@ -195,10 +192,3 @@ git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
 groupend
 
-# Fetch Patches
-groupstart "Fetching Patches"
-[[ -d swift-android-patches ]] || git clone https://github.com/swift-android-sdk/swift-android-sdk swift-android-patches
-pushd swift-android-patches >/dev/null 2>&1
-git checkout ${SWIFT_ANDROID_PATCHES_VERSION}
-popd >/dev/null 2>&1
-groupend

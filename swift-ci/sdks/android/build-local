@@ -52,7 +52,7 @@ fi
 
 # Check-out and patch the sources
 ./scripts/fetch-source.sh --source-dir ${WORKDIR}/source --swift-tag ${SWIFT_TAG}
-${WORKDIR}/source/swift-android-patches/apply-patches.sh ${WORKDIR}/source/swift-project
+${WORKDIR}/patches/apply-patches.sh ${WORKDIR}/source/swift-project
 
 mkdir -p ${WORKDIR}/products
 
