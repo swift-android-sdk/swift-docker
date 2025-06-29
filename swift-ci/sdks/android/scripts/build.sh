@@ -114,7 +114,7 @@ declare_package boringssl "boringssl" "OpenSSL AND ISC AND MIT" \
 # Parse command line arguments
 android_sdk_version=0.1
 sdk_name=
-archs=armv7,aarch64,x86_64
+archs=aarch64,armv7,x86_64
 android_api=28
 build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
@@ -449,16 +449,16 @@ for arch in $archs; do
             --skip-test-linux \
             --skip-test-xctest --skip-test-foundation \
             --build-swift-static-stdlib \
-            --swift-install-components='clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
+            --swift-install-components='compiler;clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
             --install-swift \
             --install-libdispatch \
             --install-foundation \
             --xctest --install-xctest \
+            --swift-testing --install-swift-testing \
             --cross-compile-build-swift-tools=0 \
             --llvm-ninja-targets-for-cross-compile-hosts=help \
             --cross-compile-append-host-target-to-destdir=False 
             # --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
-        # --swift-testing --install-swift-testing \
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:
         # error: could not find module '_Builtin_float' for target 'x86_64-unknown-linux-android'; found: aarch64-unknown-linux-android, at: /home/runner/work/_temp/swift-android-sdk/ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/swift/android/_Builtin_float.swiftmodule
@@ -530,7 +530,8 @@ for arch in $archs; do
         fi
 
         # need force rm in case linux is not present (when not running tests)
-        rm -rf lib/swift{,_static}/{clang,linux}
+        rm -rf lib/swift{,_static}/{FrameworkABIBaseline,_InternalSwiftScan,_InternalSwiftStaticMirror,clang,embedded,host,linux,migrator}
+        rm -rf lib/lib*.so
         mv lib/swift lib/swift-$arch
         ln -s ../swift/clang lib/swift-$arch/clang
 
