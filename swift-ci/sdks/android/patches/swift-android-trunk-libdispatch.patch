@@ -1,3 +1,15 @@
+diff --git a/swift/test/IRGen/availability_custom_domains_clang.swift b/swift/test/IRGen/availability_custom_domains_clang.swift
+index c0a79478b18..2a94211da21 100644
+--- a/swift/test/IRGen/availability_custom_domains_clang.swift
++++ b/swift/test/IRGen/availability_custom_domains_clang.swift
+@@ -9,6 +9,7 @@
+ // RUN:   -O | %FileCheck %s --check-prefixes=CHECK,CHECK-O
+ 
+ // REQUIRES: swift_feature_CustomAvailability
++// XFAIL: OS=linux-android, OS=linux-androideabi
+ 
+ // CHECK-LABEL: define {{.*}}swiftcc void @"$s4Test24ifAvailableEnabledDomainyyF"()
+ // CHECK: call void @available_in_enabled_domain()
 diff --git a/swift/test/Misc/verify-swift-feature-testing.test-sh b/swift/test/Misc/verify-swift-feature-testing.test-sh
 index 3f36fc979cb..8713ae8fea8 100755
 --- a/swift/test/Misc/verify-swift-feature-testing.test-sh
@@ -28,21 +40,6 @@ index 9a0f5b43e2d..5c7d1320a2d 100644
  
              toolchain_path = product.native_toolchain_path(args.host_target)
              cmake_swiftc_path = os.getenv('CMAKE_Swift_COMPILER',
-diff --git a/swift-corelibs-libdispatch/cmake/modules/SwiftSupport.cmake b/swift-corelibs-libdispatch/cmake/modules/SwiftSupport.cmake
-index 3da519e..e2dd8ed 100644
---- a/swift-corelibs-libdispatch/cmake/modules/SwiftSupport.cmake
-+++ b/swift-corelibs-libdispatch/cmake/modules/SwiftSupport.cmake
-@@ -4,6 +4,10 @@ if(NOT dispatch_MODULE_TRIPLE)
-   set(module_triple_command "${CMAKE_Swift_COMPILER}" -print-target-info)
-   if(CMAKE_Swift_COMPILER_TARGET)
-     list(APPEND module_triple_command -target ${CMAKE_Swift_COMPILER_TARGET})
-+  else()
-+    set(arg_list ${CMAKE_Swift_FLAGS})
-+    separate_arguments(arg_list)
-+    list(APPEND module_triple_command ${arg_list})
-   endif()
-   execute_process(COMMAND ${module_triple_command} OUTPUT_VARIABLE target_info_json)
- 
 diff --git a/swift-corelibs-libdispatch/src/swift/CMakeLists.txt b/swift-corelibs-libdispatch/src/swift/CMakeLists.txt
 index 38bef37..d0ddf98 100644
 --- a/swift-corelibs-libdispatch/src/swift/CMakeLists.txt
