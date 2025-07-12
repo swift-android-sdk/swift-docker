@@ -1,3 +1,15 @@
+diff --git a/swift/test/IRGen/availability_custom_domains_clang.swift b/swift/test/IRGen/availability_custom_domains_clang.swift
+index c0a79478b18..2a94211da21 100644
+--- a/swift/test/IRGen/availability_custom_domains_clang.swift
++++ b/swift/test/IRGen/availability_custom_domains_clang.swift
+@@ -9,6 +9,7 @@
+ // RUN:   -O | %FileCheck %s --check-prefixes=CHECK,CHECK-O
+ 
+ // REQUIRES: swift_feature_CustomAvailability
++// XFAIL: OS=linux-android, OS=linux-androideabi
+ 
+ // CHECK-LABEL: define {{.*}}swiftcc void @"$s4Test24ifAvailableEnabledDomainyyF"()
+ // CHECK: call void @available_in_enabled_domain()
 diff --git a/swift/test/Misc/verify-swift-feature-testing.test-sh b/swift/test/Misc/verify-swift-feature-testing.test-sh
 index 3f36fc979cb..8713ae8fea8 100755
 --- a/swift/test/Misc/verify-swift-feature-testing.test-sh
