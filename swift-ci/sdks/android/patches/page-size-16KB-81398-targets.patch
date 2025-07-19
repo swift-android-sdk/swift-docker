@@ -5,8 +5,8 @@ index fba09416ddb..3fbc51955f4 100644
 @@ -165,6 +165,7 @@ class AndroidPlatform(Platform):
  
          flags += '-sdk %s/sysroot ' % (android_toolchain_path)
-         flags += '-tools-directory %s/bin ' % (android_toolchain_path)
-+        flags += '--Xclang-linker -Wl,-z,max-page-size=16384'
+         flags += '-tools-directory %s/bin' % (android_toolchain_path)
++        flags += ' --Xclang-linker -Wl,-z,max-page-size=16384'
          return flags
  
      def cmake_options(self, args):
