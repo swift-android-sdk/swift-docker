@@ -463,6 +463,8 @@ for arch in $archs; do
             --libdispatch-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
             --foundation-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
             --cross-compile-append-host-target-to-destdir=False 
+
+
             # --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:

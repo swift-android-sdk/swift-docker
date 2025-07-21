@@ -1,0 +1,23 @@
+From 8db43c6290ee04145264c04728a030dd74f87452 Mon Sep 17 00:00:00 2001
+From: Marc Prud'hommeaux <marc@skip.tools>
+Date: Sun, 18 May 2025 19:10:36 -0400
+Subject: [PATCH] Support 16 KB page sizes on Android
+
+Android 15+ requires that native libraries be compiled with a linker flag to support 16 KB page sizes. See: https://developer.android.com/guide/practices/page-sizes#compile-r26-lower
+---
+ stdlib/cmake/modules/AddSwiftStdlib.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index ce113989ad75d..089f5f30acbb5 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -2469,6 +2469,8 @@ function(add_swift_target_library name)
+         list(APPEND swiftlib_link_flags_all "-shared")
+         # TODO: Instead of `lib${name}.so` find variable or target property which already have this value.
+         list(APPEND swiftlib_link_flags_all "-Wl,-soname,lib${name}.so")
++        # Ensure compatibility with Android 15+ devices using 16KB memory pages.
++        list(APPEND swiftlib_link_flags_all "-Wl,-z,max-page-size=16384")
+       endif()
+ 
+       if (SWIFTLIB_BACK_DEPLOYMENT_LIBRARY)
