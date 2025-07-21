@@ -460,6 +460,8 @@ for arch in $archs; do
             --swift-testing --install-swift-testing \
             --cross-compile-build-swift-tools=0 \
             --llvm-ninja-targets-for-cross-compile-hosts=help \
+            --libdispatch-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
+            --foundation-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
             --extra-cmake-options='-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON' \
             --cross-compile-append-host-target-to-destdir=False 
 
