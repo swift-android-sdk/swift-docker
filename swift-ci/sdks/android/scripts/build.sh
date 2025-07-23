@@ -411,6 +411,7 @@ for arch in $archs; do
                 build_cmark=""
                 local_build=""
                 build_llvm="1"
+                install_llvm="--install-llvm"
                 build_swift_tools="1"
                 validation_test="1"
                 native_swift_tools_path=""
@@ -420,6 +421,7 @@ for arch in $archs; do
                 build_cmark="--skip-build-cmark"
                 local_build="--skip-local-build"
                 build_llvm="0"
+                install_llvm=""
                 build_swift_tools="0"
                 validation_test="0"
                 native_swift_tools_path="--native-swift-tools-path=$host_toolchain/bin"
@@ -442,7 +444,7 @@ for arch in $archs; do
             --cross-compile-hosts=android-$arch \
             --cross-compile-deps-path=$sdk_root \
             --install-destdir=$sdk_root \
-            --build-llvm=$build_llvm \
+            --build-llvm=$build_llvm ${install_llvm} \
             --build-swift-tools=$build_swift_tools \
             ${native_swift_tools_path} \
             ${native_clang_tools_path} \
