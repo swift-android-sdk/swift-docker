@@ -1,3 +1,14 @@
+diff --git a/swift/test/SourceKit/CompileNotifications/edits.swift b/swift/test/SourceKit/CompileNotifications/edits.swift
+index dcc4698c15c..686ef4459d6 100644
+--- a/swift/test/SourceKit/CompileNotifications/edits.swift
++++ b/swift/test/SourceKit/CompileNotifications/edits.swift
+@@ -1,5 +1,5 @@
+ // rdar://108082630 this test is flaky in ASAN bot
+-// UNSUPPORTED: asan
++// UNSUPPORTED: asan, OS=linux-androideabi
+ 
+ // RUN: %sourcekitd-test -req=track-compiles \
+ // RUN:     == -req=sema %s -- %s \
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
 index 47e7ab79905..d88c3c242ad 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/product.py
