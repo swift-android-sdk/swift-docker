@@ -28,25 +28,14 @@ jobs:
        fail-fast: false
        matrix:
          include:
-           #- swift-version: 'swift-6.2-branch'
-           #  build-type: 'docker'
-           #  build-compiler: '1'
-           #  runner: 'self-hosted'
-           #- swift-version: 'development'
-           #  build-type: 'docker'
-           #  build-compiler: '1'
-           #  runner: 'self-hosted'
-           - swift-version: 'swift-6.2-branch'
+           - swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a'
+           #- swift-version: 'tag:swift-6.2-DEVELOPMENT-SNAPSHOT-2025-09-10-a'
              build-type: 'docker'
-             build-compiler: '0'
-             runner: 'ubuntu-24.04'
-           - swift-version: 'development'
-             build-type: 'docker'
-             build-compiler: '0'
-             runner: 'ubuntu-24.04'
+             build-compiler: '1'
+             runner: 'self-hosted'
      runs-on: ${{ matrix.runner }}
-     # 15 hour timeout
-     timeout-minutes: 900
+     # 16 hour timeout
+     timeout-minutes: 960
      steps:
       - name: Free Disk Space
         if: ${{ matrix.runner != 'self-hosted' }}
@@ -63,7 +52,7 @@ jobs:
         run: |
           # these variabes are used by build-docker and build-local
           # to determine which Swift version to build for
-          echo "BUILD_SCHEME=${{ matrix.swift-version }}" >> $GITHUB_ENV
+          echo "SWIFT_VERSION=${{ matrix.swift-version }}" >> $GITHUB_ENV
           # pass the build-compiler matrix through to the build script
           echo "BUILD_COMPILER=${{ matrix.build-compiler }}" >> $GITHUB_ENV
           echo "TARGET_ARCHS=${{ matrix.arch }}" >> $GITHUB_ENV
@@ -75,12 +64,12 @@ jobs:
         working-directory: swift-ci/sdks/android
         run: |
           sudo apt install -q patchelf build-essential cmake ninja-build python3 golang git gnupg2 libcurl4-openssl-dev libedit-dev libicu-dev libncurses5-dev libpython3-dev libsqlite3-dev libxml2-dev rsync uuid-dev uuid-runtime tzdata curl unzip
-          ./build-local ${BUILD_SCHEME} ${WORKDIR}
+          ./build-local ${SWIFT_VERSION} ${WORKDIR}
       - name: Build Android SDK (Docker)
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
         run: |
-          ./build-docker ${BUILD_SCHEME} ${WORKDIR}
+          ./build-docker ${SWIFT_VERSION} ${WORKDIR}
       - name: Install Host Toolchain
         if: ${{ matrix.build-type == 'docker' }}
         working-directory: swift-ci/sdks/android
