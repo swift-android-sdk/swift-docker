@@ -101,7 +101,7 @@ function declare_package
     packages+=(${name})
 }
 
-declare_package android_sdk \
+declare_package swift_android_sdk \
                 "Swift SDK for Android" \
                 "Apache-2.0" "https://swift.org/install"
 declare_package swift "swift" "Apache-2.0" "https://swift.org"
@@ -500,6 +500,96 @@ cat > info.json <<EOF
       "type": "swiftSDK"
     }
   }
+}
+EOF
+
+spdx_uuid=$(uuidgen)
+spdx_doc_uuid=$(uuidgen)
+spdx_timestamp=$(date -Iseconds)
+
+# Now generate SPDX data
+cat > sbom.spdx.json <<EOF
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "SBOM-SPDX-${spdx_uuid}",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "${spdx_timestamp}",
+    "creators": [
+      "Organization: Apple, Inc."
+    ]
+  },
+  "dataLicense": "Apache-2.0",
+  "documentNamespace": "urn:uuid:${spdx_doc_uuid}",
+  "documentDescribes": [
+    "SPDXRef-Package-swift-android-sdk"
+  ],
+  "packages": [
+EOF
+
+first=true
+for package in ${packages[@]}; do
+    if [[ "$first" == "true" ]]; then
+        first=false
+    else
+        cat >> sbom.spdx.json <<EOF
+    },
+EOF
+    fi
+
+    snake=${package}_snake; snake=${!snake}
+    version=${package}_version; version=${!version}
+    name=${package}_name; name=${!name}
+    license=${package}_license; license=${!license}
+    url=${package}_url; url=${!url}
+
+    cat >> sbom.spdx.json <<EOF
+    {
+      "SPDXID": "SPDXRef-Package-${snake}",
+      "name": "${name}",
+      "versionInfo": "${version}",
+      "filesAnalyzed": false,
+      "licenseDeclared": "${license}",
+      "licenseConcluded": "${license}",
+      "downloadLocation": "${url}",
+      "copyrightText": "NOASSERTION",
+      "checksums": []
+EOF
+done
+
+cat >> sbom.spdx.json <<EOF
+    }
+  ],
+  "relationships": [
+EOF
+
+first=true
+for package in ${packages[@]}; do
+    if [[ "$package" == "swift_android_sdk" ]]; then
+        continue
+    fi
+
+    if [[ "$first" == "true" ]]; then
+        first=false
+    else
+        cat >> sbom.spdx.json <<EOF
+    },
+EOF
+    fi
+
+    snake=${package}_snake; snake=${!snake}
+
+    cat >> sbom.spdx.json <<EOF
+    {
+      "spdxElementId": "SPDXRef-Package-swift-android-sdk",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-Package-${snake}"
+EOF
+done
+
+cat >> sbom.spdx.json <<EOF
+    }
+  ]
 }
 EOF
 
