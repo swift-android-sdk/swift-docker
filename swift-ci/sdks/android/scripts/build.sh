@@ -359,7 +359,6 @@ for arch in $archs; do
     groupend
 
     groupstart "Building libcurl for ${compiler_target_host}"
-    quiet_pushd ${swift_source_dir}/curl
         run cmake \
             -G Ninja \
             -S ${swift_source_dir}/curl \
@@ -393,9 +392,8 @@ for arch in $archs; do
 
         header "Installing libcurl for $arch"
         quiet_pushd ${build_dir}/$arch/curl
-            run ninja -j$parallel_jobs install
+            run cmake --install ${build_dir}/${arch}/curl
         quiet_popd
-    quiet_popd
     groupend
 
     groupstart "Building Android SDK for ${compiler_target_host}"
