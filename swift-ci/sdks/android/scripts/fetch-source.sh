@@ -149,6 +149,10 @@ elif [[ $SWIFT_VERSION == tag:* ]]; then
     utils/update-checkout ${clone_arg} --tag ${SWIFT_VERSION#tag:} ${extra_args}
 else
     utils/update-checkout ${clone_arg} --tag swift-${SWIFT_VERSION}-RELEASE ${extra_args}
+    if [[ $SWIFT_VERSION == '6.2' ]]; then
+        curl -fsSL https://github.com/swiftlang/swift/pull/84061.patch > 84061.patch
+        git apply 84061.patch
+    fi
 fi
 
 popd >/dev/null

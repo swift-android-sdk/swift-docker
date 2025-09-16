@@ -439,12 +439,6 @@ for arch in $archs; do
         # use an out-of-tree build folder
         export SWIFT_BUILD_ROOT=${build_dir}/swift-project
 
-        pushd swift
-            # apply the patch for the 6.2.0 cherry-pick of https://github.com/swiftlang/swift/pull/81596
-            curl -fsSL https://github.com/swiftlang/swift/pull/84061.patch > 84061.patch
-            git apply 84061.patch
-        popd
-
         ./swift/utils/build-script \
             $build_type_flag \
             --reconfigure \
