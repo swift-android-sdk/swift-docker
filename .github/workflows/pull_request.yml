@@ -29,12 +29,13 @@ jobs:
        matrix:
          include:
            - swift-version: '6.2'
+             build-type: 'local'
            #- swift-version: 'tag:swift-6.2-RELEASE'
            #- swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a'
            #- swift-version: 'tag:swift-6.2-DEVELOPMENT-SNAPSHOT-2025-09-10-a'
-             build-type: 'docker'
-             build-compiler: '1'
-             runner: 'self-hosted'
+           #  build-type: 'docker'
+           #  build-compiler: '1'
+           #  runner: 'self-hosted'
      runs-on: ${{ matrix.runner }}
      # 16 hour timeout
      timeout-minutes: 960
