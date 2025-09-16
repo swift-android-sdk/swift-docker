@@ -468,10 +468,10 @@ for arch in $archs; do
             --xctest --install-xctest \
             --swift-testing --install-swift-testing \
             --swift-testing-macros --install-swift-testing-macros \
-            --cross-compile-build-swift-tools=False \
+            --cross-compile-build-swift-tools=false \
             --libdispatch-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
             --foundation-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
-            --cross-compile-append-host-target-to-destdir=False 
+            --cross-compile-append-host-target-to-destdir=false
             # --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:
