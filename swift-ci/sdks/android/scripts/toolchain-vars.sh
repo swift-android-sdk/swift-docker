@@ -49,6 +49,9 @@ elif [[ $SWIFT_VERSION == scheme:* ]]; then
     echo "Building $SWIFT_VERSION with prebuilt Swift $RELEASE_TAG compiler"
     BUILD_COMPILER=yes
     echo "Branch scheme builds always build the Swift compiler from source and take much longer."
+else 
+    echo "Invalid SWIFT_VERSION: $SWIFT_VERSION"
+    exit 1
 fi
 
 SWIFT_BASE=$SWIFT_TAG-$HOST_OS
