@@ -439,6 +439,12 @@ for arch in $archs; do
         # use an out-of-tree build folder
         export SWIFT_BUILD_ROOT=${build_dir}/swift-project
 
+        pushd swift
+            # apply the patch for the 6.2.0 cherry-pick of https://github.com/swiftlang/swift/pull/81596
+            curl -fsSL https://github.com/swiftlang/swift/pull/84061.patch > 84061.patch
+            git apply 84061.patch
+        popd
+
         ./swift/utils/build-script \
             $build_type_flag \
             --reconfigure \
@@ -468,10 +474,10 @@ for arch in $archs; do
             --xctest --install-xctest \
             --swift-testing --install-swift-testing \
             --swift-testing-macros --install-swift-testing-macros \
-            --cross-compile-build-swift-tools=false \
+            --cross-compile-build-swift-tools=False \
             --libdispatch-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
             --foundation-cmake-options=-DCMAKE_SHARED_LINKER_FLAGS= \
-            --cross-compile-append-host-target-to-destdir=false
+            --cross-compile-append-host-target-to-destdir=False 
             # --extra-cmake-options='-DCMAKE_EXTRA_LINK_FLAGS="-Wl,-z,max-page-size=16384"'
         # need to remove symlink that gets created in the NDK to the previous arch's build
         # or else we get errors like:
