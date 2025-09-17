@@ -28,16 +28,15 @@ jobs:
        fail-fast: false
        matrix:
          include:
-           #- swift-version: '6.2'
-           - swift-version: 'tag:swift-6.2-RELEASE'
-             build-type: 'local'
-             runner: 'ubuntu-24.04'
            #- swift-version: 'tag:swift-6.2-RELEASE'
            #- swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a'
            #- swift-version: 'tag:swift-6.2-DEVELOPMENT-SNAPSHOT-2025-09-10-a'
-           #  build-type: 'docker'
-           #  build-compiler: '1'
-           #  runner: 'self-hosted'
+           - swift-version: 'tag:swift-6.2-RELEASE'
+           #  build-type: 'local'
+           #  runner: 'ubuntu-24.04'
+             build-type: 'docker'
+             build-compiler: '1'
+             runner: 'self-hosted'
      runs-on: ${{ matrix.runner }}
      # 16 hour timeout
      timeout-minutes: 960
