@@ -39,6 +39,9 @@ source ./scripts/toolchain-vars.sh
 # Check-out and patch the sources
 ./scripts/fetch-source.sh --source-dir ${WORKDIR}/source
 
+# New test that only fails on 32-bit armv7
+# perl -pi -e 's/CHECK-NOT: error//' ${WORKDIR}/source/swift-project/swift/test/Interop/Cxx/stdlib/use-std-vector-typechecker.swift
+
 # This `git grep` invocation in a trunk test fails in our Docker for some
 # reason, so just turn it into a plain `grep` again.
 perl -pi -e 's:"git",:#:' ${WORKDIR}/source/swift-project/swift/test/Misc/verify-swift-feature-testing.test-sh
