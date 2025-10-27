@@ -320,7 +320,7 @@ for arch in $archs; do
             -DCMAKE_TOOLCHAIN_FILE=$ndk_home/build/cmake/android.toolchain.cmake \
             -DCMAKE_BUILD_TYPE=$build_type \
             -DCMAKE_EXTRA_LINK_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind -stdlib=libc++ -fuse-ld=lld -lc++ -lc++abi -Wl,-z,max-page-size=16384" \
-            -DCMAKE_BUILD_TYPE=$build_type \
+            -DBUILD_TESTING=OFF \
             -DCMAKE_INSTALL_PREFIX=$sdk_root/usr \
             -DLIBXML2_WITH_PYTHON=NO \
             -DLIBXML2_WITH_ICU=NO \
