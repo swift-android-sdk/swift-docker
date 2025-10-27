@@ -128,7 +128,7 @@ declare_package boringssl "boringssl" "OpenSSL AND ISC AND MIT" \
 android_sdk_version=0.1
 sdk_name=
 archs=aarch64,armv7,x86_64
-android_api=28
+android_api=24
 build_type=Release
 parallel_jobs=$(($(nproc --all) + 2))
 source_dir=
