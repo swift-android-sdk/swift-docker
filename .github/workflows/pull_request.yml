@@ -30,8 +30,10 @@ jobs:
          include:
            - swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-10-16-a'
              build-type: 'docker'
+             runner: 'ubuntu-24.04'
            - swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-10-16-a'
              build-type: 'local'
+             runner: 'ubuntu-24.04'
      runs-on: ${{ matrix.runner }}
      # 16 hour timeout
      timeout-minutes: 960
