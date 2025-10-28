@@ -18,7 +18,7 @@
 TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r27d
-ANDROID_API=24
+ANDROID_API=23
 
 BASEPATH=$(dirname $(realpath $0))
 cd ${BASEPATH}

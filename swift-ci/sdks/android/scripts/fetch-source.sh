@@ -173,7 +173,7 @@ perl -pi -g -we "s#(call rm ... \".\{LIBDISPATCH_BUILD_DIR\}\"\n(\s+)fi\n)#\1\2i
 # disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
 perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-project/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
 
-# Disable posix_spawnattr_* calls for Android API 24
+# Disable posix_spawnattr_* calls for Android API 23
 perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_init;//try _throwIfPosixError\(posix_spawnattr_init;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
 perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_setflags;//try _throwIfPosixError\(posix_spawnattr_setflags;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
 perl -pi -e 's;posix_spawnattr_destroy;//posix_spawnattr_destroy;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift

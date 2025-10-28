@@ -94,7 +94,7 @@ jobs:
 
           ARTIFACT_PATH=$(realpath ${WORKDIR}/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
-          echo "sdk-id=x86_64-unknown-linux-android28" >> $GITHUB_OUTPUT
+          echo "sdk-id=x86_64-unknown-linux-android23" >> $GITHUB_OUTPUT
 
           ARTIFACT_EXT=".artifactbundle.tar.gz"
           ARTIFACT_NAME="$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
@@ -179,3 +179,18 @@ jobs:
           package-path: swift-algorithms
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+
+      - name: Checkout swift-system
+        if: ${{ matrix.runner != 'self-hosted' }}
+        uses: actions/checkout@v4
+        with:
+          repository: apple/swift-system
+          path: swift-system
+      - name: Test swift-system
+        if: ${{ matrix.runner != 'self-hosted' }}
+        uses: skiptools/swift-android-action@main
+        with:
+          package-path: swift-system
+          installed-sdk: ${{ steps.info.outputs.sdk-id }}
+          installed-swift: ${{ steps.info.outputs.swift-root }}
+
