@@ -161,3 +161,22 @@ pushd boringssl >/dev/null 2>&1
 git checkout ${BORINGSSL_VERSION}
 popd >/dev/null 2>&1
 groupend
+
+groupstart "Patchin Sources"
+# This `git grep` invocation in a trunk test fails in our Docker for some
+# reason, so just turn it into a plain `grep` again.
+perl -pi -e 's:"git",:#:' swift-project/swift/test/Misc/verify-swift-feature-testing.test-sh
+
+# Work around swiftlang/swift-driver#1822 for now
+perl -pi -g -we "s#(call rm ... \".\{LIBDISPATCH_BUILD_DIR\}\"\n(\s+)fi\n)#\1\2if [[ -d \"\\\${ANDROID_NDK}\" ]]; then call ln -sf \"\\\${SWIFT_BUILD_PATH}/lib/swift\" \"\\\${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib\"; fi#" swift-project/swift/utils/build-script-impl
+
+# disable backtrace() for Android (needs either API33+ or libandroid-execinfo, or to manually add in backtrace backport)
+perl -pi -e 's;os\(Android\);os\(AndroidDISABLED\);g' swift-project/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+
+# Disable posix_spawnattr_* calls for Android API 24
+perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_init;//try _throwIfPosixError\(posix_spawnattr_init;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
+perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_setflags;//try _throwIfPosixError\(posix_spawnattr_setflags;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
+perl -pi -e 's;posix_spawnattr_destroy;//posix_spawnattr_destroy;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
+
+groupend
+
