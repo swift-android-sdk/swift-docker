@@ -34,8 +34,12 @@ jobs:
          include:
            - swift-version: 'tag:swift-6.2-DEVELOPMENT-SNAPSHOT-2025-10-25-a'
              build-type: 'docker'
-             build-compiler: '1'
-             runner: 'self-hosted'
+             build-compiler: '0'
+             runner: 'ubuntu-24.04'
+           - swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-10-17-a'
+             build-type: 'docker'
+             build-compiler: '0'
+             runner: 'ubuntu-24.04'
      runs-on: ${{ matrix.runner }}
      # 16 hour timeout
      timeout-minutes: 1080
