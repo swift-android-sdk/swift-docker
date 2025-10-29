@@ -156,6 +156,7 @@ jobs:
           echo 'import FoundationNetworking' >> Sources/DemoProject/DemoProject.swift
           echo 'import Dispatch' >> Sources/DemoProject/DemoProject.swift
           echo 'import Android' >> Sources/DemoProject/DemoProject.swift
+
       - name: Test Demo Project on Android
         uses: skiptools/swift-android-action@main
         if: ${{ matrix.runner != 'self-hosted' }}
@@ -165,6 +166,7 @@ jobs:
           package-path: ${{ runner.temp }}/DemoProject
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+          android-api-level: 23
 
       - name: Checkout swift-algorithms
         if: ${{ matrix.runner != 'self-hosted' }}
@@ -179,6 +181,7 @@ jobs:
           package-path: swift-algorithms
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+          android-api-level: 23
 
       - name: Checkout swift-system
         if: ${{ matrix.runner != 'self-hosted' }}
@@ -193,6 +196,7 @@ jobs:
           package-path: swift-system
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+          android-api-level: 23
 
       - name: Checkout swift-collections
         if: ${{ matrix.runner != 'self-hosted' }}
@@ -207,4 +211,5 @@ jobs:
           package-path: swift-collections
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
+          android-api-level: 23
 
