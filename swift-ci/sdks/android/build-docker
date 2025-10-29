@@ -18,7 +18,6 @@
 TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r27d
-ANDROID_API=24
 
 BASEPATH=$(dirname $(realpath $0))
 cd ${BASEPATH}
@@ -60,6 +59,5 @@ $DOCKER run -i --rm \
             --products-dir "/products" \
             --host-toolchain "/usr/local/swift" \
             --build-compiler "${BUILD_COMPILER}" \
-            --android-api "${ANDROID_API}" \
             --ndk-home "/usr/local/ndk/${ANDROID_NDK_VERSION}" \
             --archs "${TARGET_ARCHS}"

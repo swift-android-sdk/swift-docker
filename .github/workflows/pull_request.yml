@@ -94,7 +94,7 @@ jobs:
 
           ARTIFACT_PATH=$(realpath ${WORKDIR}/products/*.artifactbundle.tar.gz)
           echo "artifact-path=${ARTIFACT_PATH}" >> $GITHUB_OUTPUT
-          echo "sdk-id=x86_64-unknown-linux-android24" >> $GITHUB_OUTPUT
+          echo "sdk-id=x86_64-unknown-linux-android23" >> $GITHUB_OUTPUT
 
           ARTIFACT_EXT=".artifactbundle.tar.gz"
           ARTIFACT_NAME="$(basename ${ARTIFACT_PATH} ${ARTIFACT_EXT})"
@@ -194,17 +194,17 @@ jobs:
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
 
-      - name: Checkout swift-nio
+      - name: Checkout swift-crypto
         if: ${{ matrix.runner != 'self-hosted' }}
         uses: actions/checkout@v4
         with:
-          repository: apple/swift-nio
-          path: swift-nio
-      - name: Test swift-nio
+          repository: apple/swift-crypto
+          path: swift-crypto
+      - name: Test swift-crypto
         if: ${{ matrix.runner != 'self-hosted' }}
         uses: skiptools/swift-android-action@main
         with:
-          package-path: swift-nio
+          package-path: swift-crypto
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
 

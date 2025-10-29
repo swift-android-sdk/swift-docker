@@ -178,5 +178,9 @@ perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_init;//try _throwIfPosixE
 perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_setflags;//try _throwIfPosixError\(posix_spawnattr_setflags;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
 perl -pi -e 's;posix_spawnattr_destroy;//posix_spawnattr_destroy;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
 
+# fix getgrgid_r and getgrnam_r missing from Android API 23
+perl -pi -e 's;getgrgid_r;{ _, _, _, _, _ in 0 };g' swift-project/swift-foundation/Sources/FoundationEssentials/Platform.swift
+perl -pi -e 's;getgrnam_r;{ _, _, _, _, _ in 0 };g' swift-project/swift-foundation/Sources/FoundationEssentials/Platform.swift
+
 groupend
 
