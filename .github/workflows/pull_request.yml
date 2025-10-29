@@ -194,17 +194,17 @@ jobs:
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
 
-      - name: Checkout swift-crypto
+      - name: Checkout swift-collections
         if: ${{ matrix.runner != 'self-hosted' }}
         uses: actions/checkout@v4
         with:
-          repository: apple/swift-crypto
-          path: swift-crypto
-      - name: Test swift-crypto
+          repository: apple/swift-collections
+          path: swift-collections
+      - name: Test swift-collections
         if: ${{ matrix.runner != 'self-hosted' }}
         uses: skiptools/swift-android-action@main
         with:
-          package-path: swift-crypto
+          package-path: swift-collections
           installed-sdk: ${{ steps.info.outputs.sdk-id }}
           installed-swift: ${{ steps.info.outputs.swift-root }}
 
