@@ -170,6 +170,9 @@ perl -pi -e 's:"git",:#:' swift-project/swift/test/Misc/verify-swift-feature-tes
 # Work around swiftlang/swift-driver#1822 for now
 perl -pi -g -we "s#(call rm ... \".\{LIBDISPATCH_BUILD_DIR\}\"\n(\s+)fi\n)#\1\2if [[ -d \"\\\${ANDROID_NDK}\" ]]; then call ln -sf \"\\\${SWIFT_BUILD_PATH}/lib/swift\" \"\\\${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib\"; fi#" swift-project/swift/utils/build-script-impl
 
+# fix optional backtrace() call
+perl -pi -e 's;.init\(clamping: addresses.count\)\)\);.init\(clamping: addresses.count\)\) ?? 0\);g' swift-project/swift-testing/Sources/Testing/SourceAttribution/Backtrace.swift
+
 # Disable posix_spawnattr_* calls for Android API 24
 perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_init;//try _throwIfPosixError\(posix_spawnattr_init;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
 perl -pi -e 's;try _throwIfPosixError\(posix_spawnattr_setflags;//try _throwIfPosixError\(posix_spawnattr_setflags;g' swift-project/swift-corelibs-foundation/Sources/Foundation/Process.swift
