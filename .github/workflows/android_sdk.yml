@@ -6,7 +6,7 @@
 # Note that the workflow should be removed before filing a PR
 # so it is not submitted to the upstream swiftlang/swift-docker repo
 name: Build Android SDK
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
    build:
