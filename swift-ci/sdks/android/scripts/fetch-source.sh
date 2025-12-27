@@ -166,7 +166,7 @@ groupstart "Patching Sources"
 pushd swift-project >/dev/null
 
 # Set correct CURL_CA_PATH
-curl -fsSL https://github.com/swiftlang/swift-corelibs-foundation/pull/5283.patch | git patch --directory swift-corelibs-foundation
+curl -fsSL https://github.com/swiftlang/swift-corelibs-foundation/pull/5283.patch | git apply --directory swift-corelibs-foundation
 
 popd >/dev/null 2>&1
 groupend
