@@ -165,8 +165,19 @@ groupend
 groupstart "Patching Sources"
 pushd swift-project >/dev/null
 
+function apply_pr {
+    REPO=$1
+    PR=$2
+    header "Applying ${REPO} PR ${PR}"
+    curl -fsSL "https://github.com/swiftlang/${REPO}/pull/${PR}.patch" | git apply --directory "${REPO}"
+}
+
 # Set correct CURL_CA_PATH
-curl -fsSL https://github.com/swiftlang/swift-corelibs-foundation/pull/5283.patch | git apply --directory swift-corelibs-foundation
+apply_pr swift-corelibs-foundation 5283
+
+# Needed to build back to API 23
+apply_pr swift-corelibs-foundation 5301
+apply_pr swift-foundation 1663
 
 popd >/dev/null 2>&1
 groupend

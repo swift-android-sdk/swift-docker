@@ -16,16 +16,16 @@ jobs:
        matrix:
          include:
            - runner: 'ubuntu-24.04'
-             swift-version: 'tag:swift-DEVELOPMENT-SNAPSHOT-2025-12-19-a'
+             swift-version: 'scheme:main'
              build-type: 'docker'
            - runner: 'ubuntu-24.04'
-             swift-version: 'scheme:swift-6.3-branch'
-             build-type: 'docker'
-           - runner: 'ubuntu-24.04'
-             swift-version: 'scheme:development'
+             swift-version: 'scheme:release/6.2'
              build-type: 'docker'
            - runner: 'ubuntu-24.04'
              swift-version: 'tag:swift-6.2.3-RELEASE'
+             build-type: 'docker'
+           - runner: 'ubuntu-24.04'
+             swift-version: 'tag:swift-6.3-DEVELOPMENT-SNAPSHOT-2025-12-24-a'
              build-type: 'docker'
      runs-on: ${{ matrix.runner }}
      # 16 hour timeout
