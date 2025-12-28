@@ -176,8 +176,9 @@ function apply_pr {
 apply_pr swift-corelibs-foundation 5283
 
 # Needed to build back to API 23
-apply_pr swift-corelibs-foundation 5301
-apply_pr swift-foundation 1663
+# see: https://forums.swift.org/t/android-api-minimum-for-the-swift-sdk-for-android/82874/32
+#apply_pr swift-corelibs-foundation 5301
+#apply_pr swift-foundation 1663
 
 popd >/dev/null 2>&1
 groupend
