@@ -154,10 +154,14 @@ fi
 popd >/dev/null
 groupend
 
-# Fetch BoringSSL
-groupstart "Fetching BoringSSL"
-[[ -d boringssl ]] || git clone https://boringssl.googlesource.com/boringssl
-pushd boringssl >/dev/null 2>&1
-git checkout ${BORINGSSL_VERSION}
+groupstart "Fetching XML"
+pushd swift-project/libxml2 >/dev/null 2>&1
+git checkout v2.14.5
+popd >/dev/null 2>&1
+groupend
+
+groupstart "Fetching Curl"
+pushd swift-project/curl >/dev/null 2>&1
+git checkout curl-8_15_0
 popd >/dev/null 2>&1
 groupend
