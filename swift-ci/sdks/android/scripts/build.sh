@@ -484,7 +484,7 @@ for arch in $archs; do
             ${build_cmark} \
             ${local_build} \
             --host-test \
-            --skip-test-linux \
+            --skip-test-linux --skip-clean-libdispatch --skip-clean-foundation --skip-clean-xctest \
             --skip-test-xctest --skip-test-foundation \
             --build-swift-static-stdlib \
             --swift-install-components='compiler;clang-resource-dir-symlink;license;stdlib;sdk-overlay' \
