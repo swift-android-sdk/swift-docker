@@ -18,7 +18,7 @@
 TARGET_ARCHS=${TARGET_ARCHS:-aarch64,x86_64,armv7}
 
 ANDROID_NDK_VERSION=android-ndk-r28c
-ANDROID_API=28
+ANDROID_API=23
 
 BASEPATH=$(dirname $(realpath $0))
 cd ${BASEPATH}
@@ -46,7 +46,7 @@ source ./scripts/toolchain-vars.sh
 
 # This `git grep` invocation in a trunk test fails in our Docker for some
 # reason, so just turn it into a plain `grep` again.
-perl -pi -e 's:"git",:#:' ${WORKDIR}/source/swift-project/swift/test/Misc/verify-swift-feature-testing.test-sh
+# perl -pi -e 's:"git",:#:' ${WORKDIR}/source/swift-project/swift/test/Misc/verify-swift-feature-testing.test-sh
 
 # Work around swiftlang/swift-driver#1822 for now
 perl -pi -g -we "s#(call rm ... \".\{LIBDISPATCH_BUILD_DIR\}\"\n(\s+)fi\n)#\1\2if [[ -d \"\\\${ANDROID_NDK}\" ]]; then call ln -sf \"\\\${SWIFT_BUILD_PATH}/lib/swift\" \"\\\${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib\"; fi#" ${WORKDIR}/source/swift-project/swift/utils/build-script-impl
